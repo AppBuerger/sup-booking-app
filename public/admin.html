@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>SUP Admin</title>
+<style>
+body { font-family: Arial; margin:40px }
+table { border-collapse: collapse; width:100% }
+td,th { border:1px solid #ccc; padding:8px }
+button { background:red;color:white;border:none;padding:6px 10px }
+</style>
+</head>
+
+<body>
+
+<h1>SUP Buchungen – Admin</h1>
+
+<table id="table">
+<thead>
+<tr>
+<th>Datum</th>
+<th>Zeit</th>
+<th>SUP</th>
+<th>Appartement</th>
+<th>Name</th>
+<th>Löschen</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<script>
+
+async function loadBookings(){
+
+ const res = await fetch("/api/bookings")
+ const data = await res.json()
+
+ const tbody = document.querySelector("tbody")
+ tbody.innerHTML=""
+
+ data.forEach(b => {
+
+  const tr=document.createElement("tr")
+
+  tr.innerHTML=`
+   <td>${b.datum}</td>
+   <td>${b.von} - ${b.bis}</td>
+   <td>${b.sup}</td>
+   <td>${b.appartement}</td>
+   <td>${b.nachname}</td>
+   <td><button onclick="deleteBooking(${b.id})">X</button></td>
+  `
+
+  tbody.appendChild(tr)
+ })
+
+}
+
+async function deleteBooking(id){
+
+ if(!confirm("Buchung löschen?")) return
+
+ await fetch("/api/admin/delete/"+id,{
+   method:"DELETE"
+ })
+
+ loadBookings()
+}
+
+loadBookings()
+
+</script>
+
+</body>
+</html>

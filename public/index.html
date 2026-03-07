@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>SUP Buchung</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>🏄 SUP Buchung</h1>
+
+  <form id="bookingForm">
+    <input type="text" id="nachname" placeholder="Nachname" required>
+
+    <select id="apartment" required>
+    <option value="">Appartement wählen</option>
+    <option>Top 1</option>
+    <option>Top 2</option>
+    <option>Top 3</option>
+    <option>Top 4</option>
+    <option>Top 5</option>
+    <option>Top 11</option>
+    <option>Top 12</option>
+    <option>Top 13</option>
+    <option>Top 14</option>
+  </select>
+
+    <select id="sup"></select>
+
+    <input type="date" id="date" required>
+    <label>Von:</label>
+    <input type="time" id="fromTime" required>
+   <label>Bis:</label>
+    <input type="time" id="toTime" required>
+
+    <button type="submit">Buchen</button>
+  </form>
+
+  <h2>📋 Buchungen</h2>
+  <ul id="bookings"></ul>
+
+  <script src="app.js"></script>
+</body>
+</html>
