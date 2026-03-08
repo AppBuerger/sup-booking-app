@@ -30,46 +30,65 @@ button { background:red;color:white;border:none;padding:6px 10px }
 </table>
 
 <script>
+let adminKey = "";
 
-async function loadBookings(){
-
- const res = await fetch("/api/bookings")
- const data = await res.json()
-
- const tbody = document.querySelector("tbody")
- tbody.innerHTML=""
-
- data.forEach(b => {
-
-  const tr=document.createElement("tr")
-
-  tr.innerHTML=`
-   <td>${b.datum}</td>
-   <td>${b.von} - ${b.bis}</td>
-   <td>${b.sup}</td>
-   <td>${b.appartement}</td>
-   <td>${b.nachname}</td>
-   <td><button onclick="deleteBooking(${b.id})">X</button></td>
-  `
-
-  tbody.appendChild(tr)
- })
-
+function askAdminKey() {
+  adminKey = prompt("Admin-Schlüssel eingeben:");
+  if (!adminKey) {
+    alert("Ohne Admin-Schlüssel kein Zugriff.");
+  }
 }
 
-async function deleteBooking(id){
+async function loadBookings() {
+  const res = await fetch("/api/bookings");
+  const data = await res.json();
 
- if(!confirm("Buchung löschen?")) return
+  const tbody = document.querySelector("tbody");
+  tbody.innerHTML = "";
 
- await fetch("/api/admin/delete/"+id,{
-   method:"DELETE"
- })
+  data.forEach(b => {
+    const tr = document.createElement("tr");
 
- loadBookings()
+    tr.innerHTML = `
+      <td>${b.datum}</td>
+      <td>${b.von} - ${b.bis}</td>
+      <td>${b.sup}</td>
+      <td>${b.appartement}</td>
+      <td>${b.nachname}</td>
+      <td><button onclick="deleteBooking(${b.id})">X</button></td>
+    `;
+
+    tbody.appendChild(tr);
+  });
 }
 
-loadBookings()
+async function deleteBooking(id) {
+  if (!adminKey) {
+    askAdminKey();
+    if (!adminKey) return;
+  }
 
+  if (!confirm("Buchung löschen?")) return;
+
+  const res = await fetch("/api/admin/delete/" + id, {
+    method: "DELETE",
+    headers: {
+      "X-ADMIN-KEY": adminKey
+    }
+  });
+
+  const result = await res.json();
+
+  if (!res.ok) {
+    alert(result.error || "Löschen nicht möglich.");
+    return;
+  }
+
+  loadBookings();
+}
+
+askAdminKey();
+loadBookings();
 </script>
 
 </body>

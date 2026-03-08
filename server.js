@@ -81,27 +81,36 @@ app.post("/api/book", async (req, res) => {
   }
 });
 
+//Check auf Admin_Key
+function checkAdmin(req, res, next) {
+  const adminKey = req.headers["x-admin-key"];
+
+  if (!process.env.ADMIN_KEY) {
+    return res.status(500).json({ error: "ADMIN_KEY ist am Server nicht gesetzt." });
+  }
+
+  if (adminKey !== process.env.ADMIN_KEY) {
+    return res.status(401).json({ error: "Nicht autorisiert." });
+  }
+
+  next();
+}
+
 //Admin Bereich, Buchungen sehen und löschen
-app.delete("/api/admin/delete/:id", async (req,res)=>{
+app.delete("/api/admin/delete/:id", checkAdmin, async (req, res) => {
+  const id = req.params.id;
 
- const id = req.params.id
+  try {
+    await pool.query(
+      "DELETE FROM bookings WHERE id = $1",
+      [id]
+    );
 
- try{
-
-   await pool.query(
-     "DELETE FROM bookings WHERE id=$1",
-     [id]
-   )
-
-   res.json({ok:true})
-
- }catch(err){
-
-   res.status(500).json({error:err.message})
-
- }
-
-})
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // --- Server starten ---
 const PORT = process.env.PORT || 3000;
