@@ -1,4 +1,4 @@
-require('dotenv').config();
+require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
@@ -10,112 +10,235 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));
 
-initDb().catch((e) => console.error("DB init failed:", e));
-
 // --- Konfiguration / Stammdaten ---
+
 const SUPS = [
   { id: 1, name: "SUP 1" },
   { id: 2, name: "SUP 2" },
   { id: 3, name: "SUP 3" },
 ];
 
-// --- Routes ---
+// --- Hilfsfunktionen ---
 
-// Healthcheck (optional, hilft beim Debuggen)
-app.get("/api/health", (req, res) => {
-  res.json({ ok: true });
-});
+function isHalfHourTime(time) {
+  return /^\d{2}:(00|30)(:\d{2})?$/.test(time);
+}
 
-// SUPs abrufen
-app.get("/api/sups", (req, res) => {
-  res.json(SUPS);
-});
-
-// Buchungen abrufen (aus SQLite)
-app.get("/api/bookings", async (req, res) => {
-  try {
-    const result = await pool.query(
-      `SELECT id, nachname, appartement, sup, datum, von, bis
-       FROM bookings
-       ORDER BY datum DESC, von ASC`
-    );
-    res.json(result.rows);
-  } catch (e) {
-    res.status(500).json({ message: e.message });
-  }
-});
-
-// Buchung anlegen (SQLite + Überschneidung)
-app.post("/api/book", async (req, res) => {
-  const { nachname, appartement, sup, datum, von, bis } = req.body;
-
-  if (!nachname || !appartement || !sup || !datum || !von || !bis) {
-    return res.status(400).json({ message: "Alle Felder sind Pflichtfelder!" });
-  }
-  if (von >= bis) {
-    return res.status(400).json({ message: "Die 'Bis'-Zeit muss nach der 'Von'-Zeit liegen." });
-  }
-
-  try {
-    // Überschneidung: NOT (bestehende.bis <= von OR bestehende.von >= bis)
-    const conflict = await pool.query(
-      `SELECT 1 FROM bookings
-       WHERE sup = $1 AND datum = $2
-         AND NOT (bis <= $3 OR von >= $4)
-       LIMIT 1`,
-      [sup, datum, von, bis]
-    );
-
-    if (conflict.rowCount > 0) {
-      return res.status(400).json({ message: "SUP ist in diesem Zeitraum bereits gebucht!" });
-    }
-
-    const inserted = await pool.query(
-      `INSERT INTO bookings (nachname, appartement, sup, datum, von, bis)
-       VALUES ($1, $2, $3, $4, $5, $6)
-       RETURNING id`,
-      [nachname.trim(), appartement, sup, datum, von, bis]
-    );
-
-    res.json({ message: "Buchung erfolgreich!", id: inserted.rows[0].id });
-  } catch (e) {
-    res.status(500).json({ message: e.message });
-  }
-});
-
-//Check auf Admin_Key
 function checkAdmin(req, res, next) {
   const adminKey = req.headers["x-admin-key"];
 
   if (!process.env.ADMIN_KEY) {
-    return res.status(500).json({ error: "ADMIN_KEY ist am Server nicht gesetzt." });
+    return res.status(500).json({
+      error: "ADMIN_KEY ist am Server nicht gesetzt.",
+    });
   }
 
   if (adminKey !== process.env.ADMIN_KEY) {
-    return res.status(401).json({ error: "Nicht autorisiert." });
+    return res.status(401).json({
+      error: "Nicht autorisiert.",
+    });
   }
 
   next();
 }
 
-//Admin Bereich, Buchungen sehen und löschen
-app.delete("/api/admin/delete/:id", checkAdmin, async (req, res) => {
-  const id = req.params.id;
+// --- Routes ---
 
+app.get("/api/health", (req, res) => {
+  res.json({ ok: true });
+});
+
+app.get("/api/sups", (req, res) => {
+  res.json(SUPS);
+});
+
+// Buchungen abrufen
+app.get("/api/bookings", async (req, res) => {
   try {
-    await pool.query(
-      "DELETE FROM bookings WHERE id = $1",
-      [id]
-    );
+    const result = await pool.query(
+  `SELECT
+     id,
+     nachname,
+     appartement,
+     sup,
+     TO_CHAR(datum, 'YYYY-MM-DD') AS datum,
+     TO_CHAR(von, 'HH24:MI') AS von,
+     TO_CHAR(bis, 'HH24:MI') AS bis
+   FROM bookings
+   ORDER BY datum ASC, von ASC`
+  );
 
-    res.json({ ok: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    return res.json(result.rows);
+  } catch (error) {
+    console.error("Fehler beim Laden der Buchungen:", error);
+    console.error("Einzelfehler:", error.errors);
+    console.error("Ursache:", error.cause);
+
+    return res.status(500).json({
+      message:
+        error?.message ||
+        String(error) ||
+        "Unbekannter Datenbankfehler",
+    });
   }
 });
 
-// --- Server starten ---
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server läuft auf http://localhost:${PORT}`);
+// Buchung anlegen
+app.post("/api/book", async (req, res) => {
+  const { nachname, appartement, sup, datum, von, bis } = req.body;
+
+  if (!nachname || !appartement || !sup || !datum || !von || !bis) {
+    return res.status(400).json({
+      message: "Bitte fülle alle Felder aus.",
+    });
+  }
+
+  const trimmedName = String(nachname).trim();
+
+  if (!trimmedName) {
+    return res.status(400).json({
+      message: "Bitte gib einen Nachnamen ein.",
+    });
+  }
+
+  const allowedSupNames = SUPS.map((item) => item.name);
+
+  if (!allowedSupNames.includes(sup)) {
+    return res.status(400).json({
+      message: "Das ausgewählte Gerät ist ungültig.",
+    });
+  }
+
+  if (!isHalfHourTime(von) || !isHalfHourTime(bis)) {
+    return res.status(400).json({
+      message: "Buchungen sind nur im Halbstundentakt möglich.",
+    });
+  }
+
+  if (von >= bis) {
+    return res.status(400).json({
+      message: "Die Endzeit muss nach der Startzeit liegen.",
+    });
+  }
+
+  try {
+    const conflict = await pool.query(
+      `SELECT
+         id,
+         von,
+         bis
+       FROM bookings
+       WHERE sup = $1
+         AND datum = $2
+         AND von < $4
+         AND bis > $3
+       LIMIT 1`,
+      [sup, datum, von, bis]
+    );
+
+    if (conflict.rowCount > 0) {
+      const existingBooking = conflict.rows[0];
+
+      return res.status(409).json({
+        message:
+          `${sup} ist von ` +
+          `${String(existingBooking.von).slice(0, 5)} bis ` +
+          `${String(existingBooking.bis).slice(0, 5)} Uhr bereits gebucht.`,
+      });
+    }
+
+    const inserted = await pool.query(
+      `INSERT INTO bookings
+         (
+           nachname,
+           appartement,
+           sup,
+           datum,
+           von,
+           bis
+         )
+       VALUES
+         ($1, $2, $3, $4, $5, $6)
+       RETURNING id`,
+      [
+        trimmedName,
+        appartement,
+        sup,
+        datum,
+        von,
+        bis,
+      ]
+    );
+
+    return res.status(201).json({
+      message: "Buchung erfolgreich gespeichert.",
+      id: inserted.rows[0].id,
+    });
+  } catch (error) {
+    console.error("Fehler beim Speichern der Buchung:", error);
+
+    return res.status(500).json({
+      message: "Die Buchung konnte nicht gespeichert werden.",
+    });
+  }
 });
+
+// Buchung im Adminbereich löschen
+app.delete(
+  "/api/admin/delete/:id",
+  checkAdmin,
+  async (req, res) => {
+    const id = req.params.id;
+
+    if (!/^\d+$/.test(id)) {
+      return res.status(400).json({
+        error: "Ungültige Buchungs-ID.",
+      });
+    }
+
+    try {
+      const result = await pool.query(
+        `DELETE FROM bookings
+         WHERE id = $1
+         RETURNING id`,
+        [id]
+      );
+
+      if (result.rowCount === 0) {
+        return res.status(404).json({
+          error: "Buchung wurde nicht gefunden.",
+        });
+      }
+
+      return res.json({
+        ok: true,
+        message: "Buchung wurde gelöscht.",
+      });
+    } catch (error) {
+      console.error("Fehler beim Löschen der Buchung:", error);
+
+      return res.status(500).json({
+        error: "Die Buchung konnte nicht gelöscht werden.",
+      });
+    }
+  }
+);
+
+// --- Server starten ---
+
+const PORT = process.env.PORT || 3000;
+
+async function startServer() {
+  try {
+    await initDb();
+
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server läuft auf http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error("DB init failed:", error);
+    process.exit(1);
+  }
+}
+
+startServer();
