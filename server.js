@@ -15,13 +15,27 @@ app.use(express.static("public"));
 const SUPS = [
   { id: 1, name: "SUP 1" },
   { id: 2, name: "SUP 2" },
-  { id: 3, name: "SUP 3" },
+  { id: 3, name: "Ruderboot" },
+  { id: 4, name: "Paddelboot" }
 ];
 
 // --- Hilfsfunktionen ---
 
 function isHalfHourTime(time) {
   return /^\d{2}:(00|30)(:\d{2})?$/.test(time);
+}
+
+function timeToMinutes(time) {
+  if (!time) {
+    return null;
+  }
+
+  const [hours, minutes] = String(time)
+    .slice(0, 5)
+    .split(":")
+    .map(Number);
+
+  return hours * 60 + minutes;
 }
 
 function checkAdmin(req, res, next) {
@@ -115,11 +129,28 @@ app.post("/api/book", async (req, res) => {
     });
   }
 
-  if (von >= bis) {
-    return res.status(400).json({
-      message: "Die Endzeit muss nach der Startzeit liegen.",
-    });
-  }
+  const startMinutes = timeToMinutes(von);
+const endMinutes = timeToMinutes(bis);
+const durationMinutes = endMinutes - startMinutes;
+
+if (durationMinutes <= 0) {
+  return res.status(400).json({
+    message: "Die Endzeit muss nach der Startzeit liegen.",
+  });
+}
+
+if (durationMinutes < 60) {
+  return res.status(400).json({
+    message: "Die Mindestbuchungsdauer beträgt eine Stunde.",
+  });
+}
+
+if (durationMinutes % 30 !== 0) {
+  return res.status(400).json({
+    message:
+      "Die Buchungsdauer muss in 30-Minuten-Schritten erfolgen.",
+  });
+}
 
   try {
     const conflict = await pool.query(

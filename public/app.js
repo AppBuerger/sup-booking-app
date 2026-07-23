@@ -13,11 +13,11 @@ const dateInput = document.getElementById("date");
 let messageTimer;
 let allBookings = [];
 
-// Alle möglichen Zeiten von 08:00 bis 22:00 Uhr
+// Alle möglichen Zeiten von 06:00 bis 22:00 Uhr
 function getTimeSlots() {
   const timeSlots = [];
 
-  for (let hour = 8; hour <= 22; hour++) {
+  for (let hour = 6; hour <= 22; hour++) {
     for (const minute of ["00", "30"]) {
       if (hour === 22 && minute === "30") {
         continue;
@@ -174,6 +174,25 @@ function hasTimeConflict(startTime, endTime, bookings) {
   });
 }
 
+function getValidEndTimes(startTime, bookings) {
+  const startMinutes = timeToMinutes(startTime);
+  const minimumEndMinutes = startMinutes + 60;
+
+  return getTimeSlots().filter((time) => {
+    const endMinutes = timeToMinutes(time);
+
+    if (endMinutes < minimumEndMinutes) {
+      return false;
+    }
+
+    return !hasTimeConflict(
+      startTime,
+      time,
+      bookings
+    );
+  });
+}
+
 function fillStartTimes() {
   const previousValue = fromSelect.value;
   const bookings = getSelectedBookings();
@@ -182,18 +201,14 @@ function fillStartTimes() {
   fromSelect.innerHTML = "";
   addTimePlaceholder(fromSelect);
 
-  timeSlots.forEach((time, index) => {
-    const isLastTime =
-      index === timeSlots.length - 1;
-
-    if (isLastTime) {
-      return;
-    }
-
+  timeSlots.forEach((time) => {
     const isBooked =
       isTimeInsideBooking(time, bookings);
 
-    if (!isBooked) {
+    const hasValidEndTime =
+      getValidEndTimes(time, bookings).length > 0;
+
+    if (!isBooked && hasValidEndTime) {
       fromSelect.appendChild(
         createTimeOption(time, `${time} Uhr`)
       );
@@ -213,7 +228,6 @@ function fillEndTimes() {
   const previousValue = toSelect.value;
   const selectedStart = fromSelect.value;
   const bookings = getSelectedBookings();
-  const timeSlots = getTimeSlots();
 
   toSelect.innerHTML = "";
   addTimePlaceholder(toSelect);
@@ -223,26 +237,15 @@ function fillEndTimes() {
     return;
   }
 
-  const startMinutes = timeToMinutes(selectedStart);
+  const validEndTimes = getValidEndTimes(
+    selectedStart,
+    bookings
+  );
 
-  timeSlots.forEach((time) => {
-    const endMinutes = timeToMinutes(time);
-
-    if (endMinutes <= startMinutes) {
-      return;
-    }
-
-    const hasConflict = hasTimeConflict(
-      selectedStart,
-      time,
-      bookings
+  validEndTimes.forEach((time) => {
+    toSelect.appendChild(
+      createTimeOption(time, `${time} Uhr`)
     );
-
-    if (!hasConflict) {
-      toSelect.appendChild(
-        createTimeOption(time, `${time} Uhr`)
-      );
-    }
   });
 
   const previousOptionExists = Array.from(
@@ -519,14 +522,38 @@ form.addEventListener(
       return;
     }
 
-    if (bis <= von) {
-      showMessage(
-        "Die Endzeit muss nach der Startzeit liegen.",
-        "error"
-      );
+    const startMinutes = timeToMinutes(von);
+const endMinutes = timeToMinutes(bis);
+const durationMinutes =
+  endMinutes - startMinutes;
 
-      return;
-    }
+if (durationMinutes <= 0) {
+  showMessage(
+    "Die Endzeit muss nach der Startzeit liegen.",
+    "error"
+  );
+
+  return;
+}
+
+if (durationMinutes < 60) {
+  showMessage(
+    "Die Mindestbuchungsdauer beträgt eine Stunde.",
+    "error"
+  );
+
+  return;
+}
+
+if (durationMinutes % 30 !== 0) {
+  showMessage(
+    "Die Buchungsdauer muss in 30-Minuten-Schritten erfolgen.",
+    "error"
+  );
+
+  return;
+}
+
 
     const payload = {
       nachname,
