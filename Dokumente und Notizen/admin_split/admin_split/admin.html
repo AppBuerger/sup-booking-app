@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SUP Admin</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <main class="admin-container">
+    <header class="admin-header">
+      <div>
+        <h1>SUP Admin</h1>
+        <p>Buchungen verwalten und auswerten</p>
+      </div>
+    </header>
+
+    <div id="message" class="message"></div>
+
+    <section id="loginPanel" class="panel login-panel">
+      <h2>Admin-Login</h2>
+      <div class="form-group">
+        <label for="adminKey">Admin-Schlüssel</label>
+        <input id="adminKey" type="password" autocomplete="current-password" placeholder="Admin-Schlüssel eingeben">
+      </div>
+      <div class="login-actions">
+        <button id="loginButton" type="button" class="primary-button">Anmelden</button>
+      </div>
+    </section>
+
+    <div id="adminArea" class="hidden">
+      <nav class="admin-nav">
+        <button type="button" class="nav-button active">Buchungen</button>
+        <button type="button" class="nav-button" disabled>Abrechnung</button>
+      </nav>
+
+      <section class="panel">
+        <h2>Buchungen filtern</h2>
+        <div class="filters">
+          <div class="form-group">
+            <label for="dateFrom">Datum von</label>
+            <input id="dateFrom" type="date">
+          </div>
+          <div class="form-group">
+            <label for="dateTo">Datum bis</label>
+            <input id="dateTo" type="date">
+          </div>
+          <div class="form-group">
+            <label for="apartmentFilter">Appartement</label>
+            <select id="apartmentFilter"><option value="">Alle Appartements</option></select>
+          </div>
+          <div class="form-group">
+            <label for="deviceFilter">Gerät</label>
+            <select id="deviceFilter"><option value="">Alle Geräte</option></select>
+          </div>
+        </div>
+
+        <div class="filter-actions">
+          <button id="filterButton" type="button" class="primary-button">Filter anwenden</button>
+          <button id="resetButton" type="button" class="secondary-button">Filter zurücksetzen</button>
+          <button id="logoutButton" type="button" class="secondary-button">Abmelden</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="bookings-header">
+          <h2>Alle Buchungen</h2>
+          <span id="bookingCount" class="booking-count">0 Buchungen</span>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr><th>Datum</th><th>Zeit</th><th>Appartement</th><th>Gerät</th><th>Aktion</th></tr>
+            </thead>
+            <tbody id="bookingTableBody">
+              <tr><td colspan="5" class="loading">Buchungen werden geladen …</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="admin.js"></script>
+</body>
+</html>

@@ -66,6 +66,16 @@ app.get("/api/sups", (req, res) => {
   res.json(SUPS);
 });
 
+app.get(
+  "/api/admin/check",
+  checkAdmin,
+  (req, res) => {
+    return res.json({
+      ok: true,
+    });
+  }
+);
+
 // Buchungen abrufen
 app.get("/api/bookings", async (req, res) => {
   try {
@@ -99,19 +109,11 @@ app.get("/api/bookings", async (req, res) => {
 
 // Buchung anlegen
 app.post("/api/book", async (req, res) => {
-  const { nachname, appartement, sup, datum, von, bis } = req.body;
+  const { appartement, sup, datum, von, bis } = req.body;
 
-  if (!nachname || !appartement || !sup || !datum || !von || !bis) {
+  if (!appartement || !sup || !datum || !von || !bis) {
     return res.status(400).json({
       message: "Bitte fülle alle Felder aus.",
-    });
-  }
-
-  const trimmedName = String(nachname).trim();
-
-  if (!trimmedName) {
-    return res.status(400).json({
-      message: "Bitte gib einen Nachnamen ein.",
     });
   }
 
@@ -192,7 +194,6 @@ if (durationMinutes % 30 !== 0) {
          ($1, $2, $3, $4, $5, $6)
        RETURNING id`,
       [
-        trimmedName,
         appartement,
         sup,
         datum,
