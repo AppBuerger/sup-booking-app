@@ -582,8 +582,21 @@ if (durationMinutes % 30 !== 0) {
         );
       }
 
+      // Gewähltes Datum merken
+      const selectedDate = dateInput.value;
+
+      // Formular zurücksetzen
       form.reset();
+
+      // Datum wiederherstellen
+      dateInput.value = selectedDate;
+
+      // Standardzustand herstellen
       supSelect.selectedIndex = 0;
+
+setMinimumDate();
+updateDevicePreview();
+updateTimeAvailability();
 
       setMinimumDate();
       updateDevicePreview();
