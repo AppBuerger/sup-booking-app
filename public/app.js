@@ -582,21 +582,19 @@ if (durationMinutes % 30 !== 0) {
         );
       }
 
-      // Gewähltes Datum merken
+      // Gewähltes Appartement und Datum merken
+      const selectedApartment = apartmentSelect.value;
       const selectedDate = dateInput.value;
 
       // Formular zurücksetzen
       form.reset();
 
-      // Datum wiederherstellen
+      // Appartement und Datum wiederherstellen
+      apartmentSelect.value = selectedApartment;
       dateInput.value = selectedDate;
 
-      // Standardzustand herstellen
+      // Rest zurücksetzen
       supSelect.selectedIndex = 0;
-
-setMinimumDate();
-updateDevicePreview();
-updateTimeAvailability();
 
       setMinimumDate();
       updateDevicePreview();
