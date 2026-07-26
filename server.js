@@ -107,6 +107,39 @@ app.get("/api/bookings", async (req, res) => {
   }
 });
 
+// Öffentliche Buchungsübersicht:
+// nur heutige und zukünftige Buchungen
+app.get("/api/bookings/upcoming", async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT
+         id,
+         nachname,
+         appartement,
+         sup,
+         TO_CHAR(datum, 'YYYY-MM-DD') AS datum,
+         TO_CHAR(von, 'HH24:MI') AS von,
+         TO_CHAR(bis, 'HH24:MI') AS bis
+       FROM bookings
+       WHERE datum >= CURRENT_DATE
+       ORDER BY datum ASC, von ASC`
+    );
+
+    return res.json(result.rows);
+  } catch (error) {
+    console.error(
+      "Fehler beim Laden der zukünftigen Buchungen:",
+      error
+    );
+
+    return res.status(500).json({
+      message:
+        error?.message ||
+        "Die Buchungen konnten nicht geladen werden.",
+    });
+  }
+});
+
 // Buchung anlegen
 app.post("/api/book", async (req, res) => {
   const { appartement, sup, datum, von, bis } = req.body;

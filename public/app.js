@@ -457,7 +457,7 @@ function renderBookings(bookings) {
 }
 
 async function loadBookings() {
-  const response = await fetch("/api/bookings");
+  const response = await fetch("/api/bookings/upcoming");
 
   if (!response.ok) {
     throw new Error(
