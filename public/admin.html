@@ -361,6 +361,7 @@
           id="loginButton"
           type="button"
           class="primary-button"
+          onclick="login()"
         >
           Anmelden
         </button>
@@ -480,6 +481,104 @@
           </table>
         </div>
       </section>
+
+      <section class="panel">
+        <div class="bookings-header">
+          <h2>Abrechnung</h2>
+
+          <span
+            id="billingTotal"
+            class="booking-count"
+          >
+            € 0,00
+          </span>
+        </div>
+
+        <div class="filters">
+          <div class="form-group">
+            <label for="billingApartment">
+              Appartement
+            </label>
+
+            <select id="billingApartment">
+              <option value="">
+                Appartement auswählen
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="billingDateFrom">
+              Aufenthalt von
+            </label>
+
+            <input
+              id="billingDateFrom"
+              type="date"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="billingDateTo">
+              Aufenthalt bis
+            </label>
+
+            <input
+              id="billingDateTo"
+              type="date"
+            >
+          </div>
+        </div>
+
+        <div class="filter-actions">
+          <button
+            id="calculateBillingButton"
+            type="button"
+            class="primary-button"
+          >
+            Abrechnung berechnen
+          </button>
+
+          <button
+            id="resetBillingButton"
+            type="button"
+            class="secondary-button"
+          >
+            Abrechnung zurücksetzen
+          </button>
+
+          <button
+            id="printBillingButton"
+            type="button"
+            class="secondary-button"
+            disabled
+          >
+            Abrechnung drucken / PDF
+          </button>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Datum</th>
+                <th>Zeit</th>
+                <th>Gerät</th>
+                <th>Dauer</th>
+                <th>Betrag</th>
+              </tr>
+            </thead>
+
+            <tbody id="billingTableBody">
+              <tr>
+                <td colspan="5" class="empty-state">
+                  Bitte Appartement und Aufenthaltszeitraum auswählen.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
     </div>
   </main>
 
@@ -525,6 +624,50 @@
 
     const messageBox =
       document.getElementById("message");
+    const billingApartment =
+      document.getElementById("billingApartment");
+
+    const billingDateFrom =
+      document.getElementById("billingDateFrom");
+
+    const billingDateTo =
+      document.getElementById("billingDateTo");
+
+    const calculateBillingButton =
+      document.getElementById("calculateBillingButton");
+
+    const resetBillingButton =
+      document.getElementById("resetBillingButton");
+    
+    const printBillingButton =
+      document.getElementById("printBillingButton");  
+
+    const billingTableBody =
+      document.getElementById("billingTableBody");
+
+    const billingTotal =
+      document.getElementById("billingTotal");
+   
+    const billingApartments = [
+      "Top 1",
+      "Top 2",
+      "Top 3",
+      "Top 4",
+      "Top 5",
+      "Top 11",
+      "Top 12",
+      "Top 13",
+      "Top 14",
+    ];
+
+    billingApartments.forEach((apartment) => {
+      const option = document.createElement("option");
+
+      option.value = apartment;
+      option.textContent = apartment;
+
+      billingApartment.appendChild(option);
+  });
 
     let adminKey = "";
     let allBookings = [];
@@ -573,6 +716,402 @@
       }
 
       return String(value).slice(0, 5);
+    }
+
+    function timeToMinutes(value) {
+     if (!value) {
+      return 0;
+      }
+
+      const [hours, minutes] =
+        String(value)
+          .slice(0, 5)
+          .split(":")
+          .map(Number);
+
+      return hours * 60 + minutes;
+    }
+
+    function calculateBookingPrice(booking) {
+      const startMinutes =
+        timeToMinutes(booking.von);
+
+      const endMinutes =
+        timeToMinutes(booking.bis);
+
+      const durationMinutes =
+        endMinutes - startMinutes;
+
+      if (durationMinutes < 60) {
+        return 0;
+      }
+
+      let firstHourPrice = 0;
+      let additionalHalfHourPrice = 0;
+
+      switch (booking.sup) {
+        case "SUP 1":
+        case "SUP 2":
+          firstHourPrice = 5;
+          additionalHalfHourPrice = 2.5;
+        break;
+
+        case "Ruderboot":
+          firstHourPrice = 15;
+          additionalHalfHourPrice = 7.5;
+        break;
+
+        case "Paddelboot":
+          firstHourPrice = 10;
+          additionalHalfHourPrice = 5;
+        break;
+
+        default:
+          return 0;
+      }
+
+      const additionalMinutes =
+        Math.max(0, durationMinutes - 60);
+
+      const additionalHalfHours =
+        Math.ceil(additionalMinutes / 30);
+
+      return (
+        firstHourPrice +
+        additionalHalfHours *
+          additionalHalfHourPrice
+    );
+  }
+
+    function formatCurrency(value) {
+      return new Intl.NumberFormat(
+        "de-AT",
+        {
+          style: "currency",
+          currency: "EUR",
+        }
+      ).format(value);
+    }
+
+    function formatDuration(minutes) {
+      const hours = Math.floor(minutes / 60);
+      const remainingMinutes = minutes % 60;
+
+      if (remainingMinutes === 0) {
+        return `${hours} Std.`;
+      }   
+
+      return `${hours} Std. ${remainingMinutes} Min.`;
+  }
+
+    function calculateBilling() {
+      const selectedApartment =
+        billingApartment.value;
+
+      const dateFrom =
+        billingDateFrom.value;
+
+      const dateTo =
+        billingDateTo.value;
+
+      if (
+        !selectedApartment ||
+        !dateFrom ||
+        !dateTo
+    ) {
+        alert(
+          "Bitte Appartement und Aufenthaltszeitraum auswählen."
+        );
+
+        return;
+      }
+
+      if (dateFrom > dateTo) {
+        alert(
+          "Das Von-Datum darf nicht nach dem Bis-Datum liegen."
+        );
+
+        return;
+    }
+
+      const billingBookings =
+        allBookings
+          .filter((booking) => {
+            const bookingDate =
+              String(booking.datum).slice(0, 10);
+
+            return (
+              booking.appartement ===
+                selectedApartment &&
+              bookingDate >= dateFrom &&
+              bookingDate <= dateTo
+          );
+        })
+        .sort((a, b) => {
+          const dateComparison =
+            String(a.datum).localeCompare(
+              String(b.datum)
+            );
+
+          if (dateComparison !== 0) {
+            return dateComparison;
+          }
+
+          return String(a.von).localeCompare(
+            String(b.von)
+          );
+        });
+
+      if (billingBookings.length === 0) {
+        billingTableBody.innerHTML = `
+          <tr>
+            <td colspan="5" class="empty-state">
+              Für diesen Aufenthalt wurden keine Buchungen gefunden.
+            </td>
+          </tr>
+      `;
+
+        billingTotal.textContent =
+          formatCurrency(0);
+          printBillingButton.disabled = true;
+
+        return;
+      }
+
+      let total = 0;
+
+      billingTableBody.innerHTML =
+        billingBookings
+          .map((booking) => {
+            const startMinutes =
+              timeToMinutes(booking.von);
+
+            const endMinutes =
+              timeToMinutes(booking.bis);
+
+            const durationMinutes =
+              endMinutes - startMinutes;
+
+            const price =
+              calculateBookingPrice(booking);
+
+            total += price;
+
+            return `
+              <tr>
+                <td>
+                  ${formatDate(booking.datum)}
+                </td>
+
+                <td>
+                  ${formatTime(booking.von)}
+                  –
+                  ${formatTime(booking.bis)}
+                </td>
+
+                <td>
+                  ${booking.sup}
+                </td>
+
+                <td>
+                  ${formatDuration(
+                    durationMinutes
+                )}
+                </td>
+
+                <td>
+                  ${formatCurrency(price)}
+                </td>
+              </tr>
+            `;
+        })
+        .join("");
+
+      billingTotal.textContent =
+        formatCurrency(total);
+        printBillingButton.disabled = false;
+      }
+
+      function resetBilling() {
+        billingApartment.value = "";
+        billingDateFrom.value = "";
+        billingDateTo.value = "";
+
+        billingTotal.textContent =
+          formatCurrency(0);
+
+        printBillingButton.disabled = true;  
+
+        billingTableBody.innerHTML = `
+          <tr>
+            <td colspan="5" class="empty-state">
+              Bitte Appartement und Aufenthaltszeitraum auswählen.
+            </td>
+          </tr>
+        `;
+      }
+
+      function printBilling() {
+        const selectedApartment =
+          billingApartment.value;
+
+        const dateFrom =
+          billingDateFrom.value;
+
+        const dateTo =
+          billingDateTo.value;
+
+        if (
+          !selectedApartment ||
+          !dateFrom ||
+          !dateTo
+      ) {
+        alert(
+          "Bitte zuerst eine Abrechnung berechnen."
+        );
+
+        return;
+      }
+
+        const rows =
+          billingTableBody.querySelectorAll("tr");
+
+        if (
+          rows.length === 0 ||
+          billingTableBody.querySelector(
+            ".empty-state"
+          )
+      ) {
+        alert(
+          "Für diese Auswahl ist keine Abrechnung vorhanden."
+        );
+
+        return;
+    }
+
+        const printWindow =
+        window.open("", "_blank");
+
+      if (!printWindow) {
+        alert(
+          "Das Druckfenster wurde blockiert. Bitte Pop-ups für diese Seite erlauben."
+        );
+
+        return;
+    }
+
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="de">
+          <head>
+            <meta charset="UTF-8">
+
+            <title>
+              Abrechnung ${selectedApartment}
+            </title>
+
+            <style>
+              body {
+                padding: 30px;
+                font-family: Arial, sans-serif;
+                color: #18323a;
+              }
+
+              h1 {
+                margin-bottom: 8px;
+              }
+
+              .billing-info {
+                margin-bottom: 24px;
+                line-height: 1.6;
+              }
+
+              table {
+                width: 100%;
+                border-collapse: collapse;
+              }
+
+              th,
+              td {
+                padding: 10px;
+                border: 1px solid #cfdadd;
+                text-align: left;
+              }
+
+              th {
+                background: #edf3f4;
+              }
+
+              .total {
+                margin-top: 24px;
+                text-align: right;
+                font-size: 22px;
+                font-weight: bold;
+              }
+
+              .footer {
+                margin-top: 40px;
+                color: #64777d;
+                font-size: 12px;
+              }
+
+              @media print {
+                body {
+                  padding: 0;
+                }
+              }
+            </style>
+          </head>
+
+          <body>
+            <h1>Abrechnung Bootsverleih</h1>
+
+            <div class="billing-info">
+              <strong>Appartement:</strong>
+                ${selectedApartment}
+              <br>
+
+            <strong>Aufenthalt:</strong>
+              ${formatDate(dateFrom)}
+              bis
+              ${formatDate(dateTo)}
+            </div>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Datum</th>
+                  <th>Zeit</th>
+                  <th>Gerät</th>
+                  <th>Dauer</th>
+                  <th>Betrag</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${billingTableBody.innerHTML}
+              </tbody>
+            </table>
+
+            <div class="total">
+              Gesamt:
+              ${billingTotal.textContent}
+            </div>
+
+            <div class="footer">
+              Appartements Bürger
+            </div>
+          </body>
+        </html>
+      `);
+
+      printWindow.document.close();
+
+      printWindow.focus();
+
+      setTimeout(() => {
+        printWindow.print();
+      }, 300);
     }
 
     function getDeviceClass(deviceName) {
@@ -880,16 +1419,17 @@
     }
 
     async function login() {
+
       const enteredKey =
         adminKeyInput.value.trim();
 
       if (!enteredKey) {
         showMessage(
-          "Bitte gib den Admin-Schlüssel ein.",
-          "error"
-        );
+         "Bitte gib den Admin-Schlüssel ein.",
+         "error"
+       );
 
-        return;
+       return;
       }
 
       adminKey = enteredKey;
@@ -898,44 +1438,46 @@
       loginButton.textContent =
         "Anmeldung läuft …";
 
-      const response = await fetch(
-  "/api/admin/check",
-  {
-    headers: {
-      "X-ADMIN-KEY": adminKey,
-    },
-  }
-);
+      try {
+        const response = await fetch(
+          "/api/admin/check",
+          {
+            headers: {
+              "X-ADMIN-KEY": adminKey,
+            },
+          }
+      );
 
-const result =
-  await response
-    .json()
-    .catch(() => ({}));
+      const result =
+        await response
+          .json()
+          .catch(() => ({}));
 
-if (!response.ok) {
-  throw new Error(
-    result.error ||
-    "Der Admin-Schlüssel ist ungültig."
-  );
-}
-
-await loadBookings();
-
-        loginPanel.classList.add("hidden");
-        adminArea.classList.remove("hidden");
-      } catch (error) {
-        console.error(error);
-
-        showMessage(
-          error.message ||
-          "Der Adminbereich konnte nicht geladen werden.",
-          "error"
+      if (!response.ok) {
+        throw new Error(
+          result.error ||
+          "Der Admin-Schlüssel ist ungültig."
         );
-      } finally {
-        loginButton.disabled = false;
-        loginButton.textContent = "Anmelden";
       }
+
+      await loadBookings();
+
+      loginPanel.classList.add("hidden");
+      adminArea.classList.remove("hidden");
+    } catch (error) {
+      console.error(error);
+
+      showMessage(
+        error.message ||
+        "Der Adminbereich konnte nicht geladen werden.",
+        "error"
+      );
+    } finally {
+      loginButton.disabled = false;
+      loginButton.textContent = "Anmelden";
     }
+  }
+
 
     function logout() {
       adminKey = "";
@@ -1012,11 +1554,6 @@ await loadBookings();
       }
     }
 
-    loginButton.addEventListener(
-      "click",
-      login
-    );
-
     adminKeyInput.addEventListener(
       "keydown",
       (event) => {
@@ -1060,6 +1597,42 @@ await loadBookings();
       "change",
       applyFilters
     );
+
+    calculateBillingButton.addEventListener(
+      "click",
+      calculateBilling
+    );
+
+    resetBillingButton.addEventListener(
+      "click",
+      resetBilling
+    );
+
+    printBillingButton.addEventListener(
+      "click",
+      printBilling
+    );
+
+    billingApartment.addEventListener(
+      "change",
+      () => {
+        printBillingButton.disabled = true;
+      }
+    );
+
+    billingDateFrom.addEventListener(
+      "change",
+      () => {
+        printBillingButton.disabled = true;
+      }
+    );
+
+    billingDateTo.addEventListener(
+      "change",
+      () => {
+        printBillingButton.disabled = true;
+      }
+  );
   </script>
 </body>
 </html>

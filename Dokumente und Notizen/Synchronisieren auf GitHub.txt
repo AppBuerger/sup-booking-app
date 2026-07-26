@@ -1,0 +1,16 @@
+Meine Empfehlung für deinen Workflow
+
+Da du sowohl am Stand-PC als auch am Laptop arbeitest, verwende jedes Mal diese Reihenfolge:
+
+Vor dem Arbeiten:
+
+cd C:\Users\buerg\SUP_App
+git pull --rebase origin main
+
+Nach dem Arbeiten:
+
+git add .
+git commit -m "Kurze Beschreibung"
+git push origin main
+
+So bleiben Laptop, Stand-PC und GitHub immer synchron und du vermeidest die meisten Merge-Konflikte.

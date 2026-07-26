@@ -1,16 +1,17 @@
 wir brauchen:
 
+- 	für Buchung soll nur Angabe von Top erforderlich sein, Name ist nicht relevant
 - 	Anpassung der Liste von SUPs: SUP 1, SUP 2, Ruderboot, Paddelboot
 - 	Buchungszeitraum anpassen von 6 bis 22 Uhr
 - 	Buchung zur vollen oder halben Stunde, aber mindestens eine Stunde, danach im Halbstundentakt weiter möglich
-- automatische Bestätigung per Mail, dies aber nicht als Pflichtfeld, sondern in der Art "Wenn Sie eine Buchungsbestätigung zugesendet bekommen möchten, geben Sie die Mailadresse ein"
 - Logo anpassen
 - Preise einfügen
 
 Admin Bereich
-- Auflistung aller Buchungen
-- Auswertung auf Basis der Appartements und DAtumsbereich mit automatischer Berechnung der Kosten
-- Ausgabe dieser Auswertung auf DIN A4 PDF
+- 	Auflistung aller Buchungen
+- 	Auswertung auf Basis der Appartements und Datumsbereich mit automatischer Berechnung der Kosten
+- 	Ausgabe dieser Auswertung auf DIN A4 PDF
+- PDF optisch professioneller gestalten (Logo, Anschrift, sauberer Rechnungskopf)
 
 
 Mein Vorschlag
@@ -26,3 +27,5 @@ ohne im JavaScript oder Servercode Änderungen vornehmen zu müssen.
 Das macht die App wesentlich wartungsfreundlicher.
 
 Schick mir einmal den Inhalt deiner server.js (oder zumindest den Bereich mit /api/sups), dann zeige ich dir genau, wo die Liste momentan definiert ist.
+
+

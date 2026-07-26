@@ -49,13 +49,14 @@ select {
 }
 
 .site-header {
-  padding: 24px 28px 12px;
+  padding: 28px 28px 18px;
 }
 
 .header-content {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 28px;
   width: min(1180px, 100%);
   margin: 0 auto;
 }
@@ -63,30 +64,38 @@ select {
 .brand {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 24px;
+  min-width: 0;
 }
 
 .site-logo {
   display: block;
   flex: 0 0 auto;
-  width: 110px;
-  height: 90px;
+  width: 120px;
+  height: 120px;
   padding: 0;
-  border-radius: 14px;
+  border-radius: 18px;
   background: #ffffff;
-  box-shadow: 0 8px 20px rgba(24, 50, 58, 0.14);
+  box-shadow: 0 10px 26px rgba(24, 50, 58, 0.14);
   object-fit: contain;
 }
 
-.eyebrow {
-  margin: 0 0 5px;
-  color: var(--primary);
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
 }
 
+.hero-eyebrow {
+  margin: 0 0 8px;
+  color: var(--primary);
+  font-size: clamp(1.2rem, 2.2vw, 1.75rem);
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
 h1,
 h2,
 p {
@@ -95,8 +104,10 @@ p {
 
 h1 {
   margin: 0;
-  font-size: clamp(1.45rem, 3vw, 2.15rem);
-  line-height: 1.15;
+  font-size: clamp(2rem, 4.2vw, 3.4rem);
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 h2 {
@@ -470,22 +481,30 @@ button[type="submit"]:disabled {
   }
 
   .header-content {
-    align-items: flex-start;
-    gap: 12px;
+  align-items: flex-start;
+  gap: 14px;
   }
 
   .brand {
-    align-items: flex-start;
-    gap: 11px;
+    align-items: center;
+    gap: 14px;
   }
 
   .site-logo {
-    width: 76px;
-    height: 64px;
-    padding: 0;
-    border-radius: 11px;
+    width: 82px;
+    height: 82px;
+    border-radius: 13px;
   }
 
+  .hero-eyebrow {
+    margin-bottom: 5px;
+    font-size: 0.95rem;
+    letter-spacing: 0.1em;
+  }
+
+  h1 {
+    font-size: clamp(1.55rem, 7vw, 2.1rem);
+  }
   .admin-link {
     min-height: 38px;
     padding: 8px 12px;
