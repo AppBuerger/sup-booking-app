@@ -582,8 +582,6 @@ if (durationMinutes % 30 !== 0) {
         );
       }
 
-      await loadBookings();
-
       form.reset();
       supSelect.selectedIndex = 0;
 
@@ -596,6 +594,9 @@ if (durationMinutes % 30 !== 0) {
         "Buchung erfolgreich gespeichert.",
         "success"
       );
+
+      await loadBookings();
+
     } catch (error) {
       console.error(error);
 
