@@ -4,8 +4,8 @@ wir brauchen:
 - 	Anpassung der Liste von SUPs: SUP 1, SUP 2, Ruderboot, Paddelboot
 - 	Buchungszeitraum anpassen von 6 bis 22 Uhr
 - 	Buchung zur vollen oder halben Stunde, aber mindestens eine Stunde, danach im Halbstundentakt weiter möglich
-- Logo anpassen
-- Preise einfügen
+- 	Logo anpassen
+- 	Preise einfügen
 
 Admin Bereich
 - 	Auflistung aller Buchungen

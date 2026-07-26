@@ -240,7 +240,7 @@ if (durationMinutes % 30 !== 0) {
       message: "Buchung erfolgreich gespeichert.",
       id: inserted.rows[0].id,
     });
-  } } catch (error) {
+  } catch (error) {
   console.error("Fehler beim Speichern der Buchung:", error);
   console.error("Fehlermeldung:", error.message);
   console.error("Fehlercode:", error.code);

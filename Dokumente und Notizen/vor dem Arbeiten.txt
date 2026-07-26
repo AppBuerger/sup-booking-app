@@ -1,0 +1,20 @@
+vor dem Arbeiten:
+
+cd C:\Users\buerg\SUP_App
+git pull --rebase origin main
+
+
+nach dem Arbeiten
+
+git add .
+git commit -m "Admin Druck Rechnung"
+git push origin main
+
+
+Überprüfung, ob alles passt
+
+git Status
+
+
+
+
