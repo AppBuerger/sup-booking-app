@@ -9,6 +9,7 @@ const devicePreviewText =
 const fromSelect = document.getElementById("fromTime");
 const toSelect = document.getElementById("toTime");
 const dateInput = document.getElementById("date");
+const apartmentSelect = document.getElementById("apartment");
 
 let messageTimer;
 let allBookings = [];
