@@ -207,13 +207,17 @@ if (durationMinutes % 30 !== 0) {
       message: "Buchung erfolgreich gespeichert.",
       id: inserted.rows[0].id,
     });
-  } catch (error) {
-    console.error("Fehler beim Speichern der Buchung:", error);
+  } } catch (error) {
+  console.error("Fehler beim Speichern der Buchung:", error);
+  console.error("Fehlermeldung:", error.message);
+  console.error("Fehlercode:", error.code);
 
-    return res.status(500).json({
-      message: "Die Buchung konnte nicht gespeichert werden.",
-    });
-  }
+  return res.status(500).json({
+    message:
+      error?.message ||
+      "Die Buchung konnte nicht gespeichert werden.",
+  });
+}
 });
 
 // Buchung im Adminbereich löschen
