@@ -69,15 +69,28 @@ select {
 }
 
 .site-logo {
-  display: block;
-  flex: 0 0 auto;
-  width: 120px;
-  height: 120px;
+  display: block !important;
+  flex: 0 0 110px;
+
+  width: 110px !important;
+  height: 110px !important;
+  min-width: 110px;
+  min-height: 110px;
+  max-width: 110px !important;
+  max-height: 110px !important;
+
   padding: 0;
+  margin: 0;
+
   border-radius: 18px;
   background: #ffffff;
   box-shadow: 0 10px 26px rgba(24, 50, 58, 0.14);
+
   object-fit: contain;
+  object-position: center;
+
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .brand-text {
@@ -481,18 +494,25 @@ button[type="submit"]:disabled {
   }
 
   .header-content {
-  align-items: flex-start;
-  gap: 14px;
+    align-items: flex-start;
+    gap: 12px;
   }
 
   .brand {
     align-items: center;
-    gap: 14px;
+    gap: 12px;
   }
 
   .site-logo {
-    width: 82px;
-    height: 82px;
+    flex-basis: 72px;
+
+    width: 72px !important;
+    height: 72px !important;
+    min-width: 72px;
+    min-height: 72px;
+    max-width: 72px !important;
+    max-height: 72px !important;
+
     border-radius: 13px;
   }
 
@@ -505,6 +525,7 @@ button[type="submit"]:disabled {
   h1 {
     font-size: clamp(1.55rem, 7vw, 2.1rem);
   }
+
   .admin-link {
     min-height: 38px;
     padding: 8px 12px;
