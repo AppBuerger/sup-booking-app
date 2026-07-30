@@ -11,15 +11,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));
 
-// --- Konfiguration / Stammdaten ---
-
-const SUPS = [
-  { id: 1, name: "SUP 1" },
-  { id: 2, name: "SUP 2" },
-  { id: 3, name: "Ruderboot" },
-  { id: 4, name: "Paddelboot" }
-];
-
 // --- Hilfsfunktionen ---
 
 function isHalfHourTime(time) {
@@ -319,8 +310,32 @@ app.get("/api/health", (req, res) => {
   res.json({ ok: true });
 });
 
-app.get("/api/sups", (req, res) => {
-  res.json(SUPS);
+app.get("/api/sups", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT
+        id,
+        name,
+        category,
+        image_filename,
+        display_order
+      FROM rental_devices
+      WHERE is_active = TRUE
+      ORDER BY display_order ASC, name ASC
+    `);
+
+    return res.json(result.rows);
+  } catch (error) {
+    console.error(
+      "Fehler beim Laden der Geräte:",
+      error
+    );
+
+    return res.status(500).json({
+      message:
+        "Die Geräteliste konnte nicht geladen werden.",
+    });
+  }
 });
 
 app.get(
@@ -407,14 +422,6 @@ app.post("/api/book", async (req, res) => {
     });
   }
 
-  const allowedSupNames = SUPS.map((item) => item.name);
-
-  if (!allowedSupNames.includes(sup)) {
-    return res.status(400).json({
-      message: "Das ausgewählte Gerät ist ungültig.",
-    });
-  }
-
   if (!isHalfHourTime(von) || !isHalfHourTime(bis)) {
     return res.status(400).json({
       message: "Buchungen sind nur im Halbstundentakt möglich.",
@@ -445,6 +452,24 @@ if (durationMinutes % 30 !== 0) {
 }
 
   try {
+    const deviceResult = await pool.query(
+      `SELECT
+         id,
+         name
+       FROM rental_devices
+       WHERE name = $1
+         AND is_active = TRUE
+       LIMIT 1`,
+      [sup]
+    );
+
+    if (deviceResult.rowCount === 0) {
+      return res.status(400).json({
+        message:
+          "Das ausgewählte Gerät ist ungültig oder derzeit nicht verfügbar.",
+      });
+    }
+
     const conflict = await pool.query(
       `SELECT
          id,

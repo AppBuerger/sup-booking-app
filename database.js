@@ -10,6 +10,74 @@ const pool = new Pool({
 });
 
 async function initDb() {
+  // Geräte für den Verleih
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS rental_devices (
+      id BIGSERIAL PRIMARY KEY,
+      name TEXT NOT NULL UNIQUE,
+      category TEXT NOT NULL DEFAULT 'SUP',
+      first_hour_price NUMERIC(10, 2) NOT NULL DEFAULT 0,
+      additional_half_hour_price NUMERIC(10, 2) NOT NULL DEFAULT 0,
+      image_filename TEXT,
+      display_order INTEGER NOT NULL DEFAULT 0,
+      is_active BOOLEAN NOT NULL DEFAULT TRUE,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS rental_devices_active_order_idx
+    ON rental_devices (is_active, display_order, name);
+  `);
+
+  // Bestehende Geräte einmalig eintragen.
+  // Bereits vorhandene Geräte werden nicht überschrieben.
+  await pool.query(`
+    INSERT INTO rental_devices (
+      name,
+      category,
+      first_hour_price,
+      additional_half_hour_price,
+      image_filename,
+      display_order
+    )
+    VALUES
+      (
+        'SUP 1',
+        'SUP',
+        5.00,
+        2.50,
+        'sup1.jpg',
+        1
+      ),
+      (
+        'SUP 2',
+        'SUP',
+        5.00,
+        2.50,
+        'sup2.jpg',
+        2
+      ),
+      (
+        'Ruderboot',
+        'Boot',
+        15.00,
+        7.50,
+        'ruderboot.jpg',
+        3
+      ),
+      (
+        'Paddelboot',
+        'Boot',
+        10.00,
+        5.00,
+        'paddelboot.jpg',
+        4
+      )
+    ON CONFLICT (name) DO NOTHING;
+  `);
+
   // Bestehende Buchungstabelle
   await pool.query(`
     CREATE TABLE IF NOT EXISTS bookings (
@@ -29,7 +97,7 @@ async function initDb() {
     ON bookings (sup, datum);
   `);
 
-  // Neue Tabelle für gespeicherte Abrechnungs-PDFs
+  // Gespeicherte Abrechnungs-PDFs
   await pool.query(`
     CREATE TABLE IF NOT EXISTS billing_documents (
       id BIGSERIAL PRIMARY KEY,
