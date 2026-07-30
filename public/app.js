@@ -264,12 +264,20 @@ function updateTimeAvailability() {
 }
 
 function setMinimumDate() {
-  const todayValue = getTodayValue();
+  const today = new Date();
 
-  dateInput.min = todayValue;
+  // 30 Tage zurück
+  today.setDate(today.getDate() - 30);
 
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+
+  dateInput.min = `${year}-${month}-${day}`;
+
+  // Nur beim ersten Laden automatisch auf heute setzen
   if (!dateInput.value) {
-    dateInput.value = todayValue;
+    dateInput.value = getTodayValue();
   }
 }
 
