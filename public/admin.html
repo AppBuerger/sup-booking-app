@@ -152,7 +152,8 @@
     }
 
     .login-actions,
-    .filter-actions {
+    .filter-actions,
+    .document-actions {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
@@ -282,6 +283,38 @@
       color: var(--muted);
     }
 
+
+    .documents-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .document-card {
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fbfdfd;
+    }
+
+    .document-title {
+      margin: 0;
+      overflow-wrap: anywhere;
+      font-size: 17px;
+    }
+
+    .document-meta {
+      margin: 8px 0 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .document-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
     .hidden {
       display: none;
     }
@@ -317,7 +350,8 @@
       }
 
       .login-actions button,
-      .filter-actions button {
+      .filter-actions button,
+      .document-actions button {
         width: 100%;
       }
     }
@@ -548,12 +582,12 @@
           </button>
 
           <button
-            id="printBillingButton"
+            id="createPdfButton"
             type="button"
-            class="secondary-button"
+            class="primary-button"
             disabled
           >
-            Abrechnung drucken / PDF
+            PDF erstellen und speichern
           </button>
         </div>
 
@@ -577,6 +611,28 @@
               </tr>
             </tbody>
           </table>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="bookings-header">
+          <h2>Gespeicherte Abrechnungen</h2>
+
+          <span
+            id="documentCount"
+            class="booking-count"
+          >
+            0 PDFs
+          </span>
+        </div>
+
+        <div
+          id="documentsList"
+          class="documents-list"
+        >
+          <div class="loading">
+            PDF-Liste wird geladen …
+          </div>
         </div>
       </section>
     </div>
@@ -639,8 +695,14 @@
     const resetBillingButton =
       document.getElementById("resetBillingButton");
     
-    const printBillingButton =
-      document.getElementById("printBillingButton");  
+    const createPdfButton =
+      document.getElementById("createPdfButton");
+
+    const documentsList =
+      document.getElementById("documentsList");
+
+    const documentCount =
+      document.getElementById("documentCount");  
 
     const billingTableBody =
       document.getElementById("billingTableBody");
@@ -671,6 +733,7 @@
 
     let adminKey = "";
     let allBookings = [];
+    let currentBillingBookings = [];
     let messageTimer;
 
     function showMessage(
@@ -818,62 +881,64 @@
         !selectedApartment ||
         !dateFrom ||
         !dateTo
-    ) {
-        alert(
-          "Bitte Appartement und Aufenthaltszeitraum auswählen."
+      ) {
+        showMessage(
+          "Bitte Appartement und Aufenthaltszeitraum auswählen.",
+          "error"
         );
 
         return;
       }
 
       if (dateFrom > dateTo) {
-        alert(
-          "Das Von-Datum darf nicht nach dem Bis-Datum liegen."
+        showMessage(
+          "Das Von-Datum darf nicht nach dem Bis-Datum liegen.",
+          "error"
         );
 
         return;
-    }
+      }
 
-      const billingBookings =
+      currentBillingBookings =
         allBookings
           .filter((booking) => {
             const bookingDate =
-              String(booking.datum).slice(0, 10);
+              getDateValue(booking.datum);
 
             return (
-              booking.appartement ===
-                selectedApartment &&
+              booking.appartement === selectedApartment &&
               bookingDate >= dateFrom &&
               bookingDate <= dateTo
-          );
-        })
-        .sort((a, b) => {
-          const dateComparison =
-            String(a.datum).localeCompare(
-              String(b.datum)
             );
+          })
+          .sort((a, b) => {
+            const dateComparison =
+              getDateValue(a.datum).localeCompare(
+                getDateValue(b.datum)
+              );
 
-          if (dateComparison !== 0) {
-            return dateComparison;
-          }
+            if (dateComparison !== 0) {
+              return dateComparison;
+            }
 
-          return String(a.von).localeCompare(
-            String(b.von)
-          );
-        });
+            return String(a.von).localeCompare(
+              String(b.von)
+            );
+          });
 
-      if (billingBookings.length === 0) {
+      if (currentBillingBookings.length === 0) {
         billingTableBody.innerHTML = `
           <tr>
             <td colspan="5" class="empty-state">
               Für diesen Aufenthalt wurden keine Buchungen gefunden.
             </td>
           </tr>
-      `;
+        `;
 
         billingTotal.textContent =
           formatCurrency(0);
-          printBillingButton.disabled = true;
+
+        createPdfButton.disabled = true;
 
         return;
       }
@@ -881,7 +946,7 @@
       let total = 0;
 
       billingTableBody.innerHTML =
-        billingBookings
+        currentBillingBookings
           .map((booking) => {
             const startMinutes =
               timeToMinutes(booking.von);
@@ -899,219 +964,403 @@
 
             return `
               <tr>
+                <td>${formatDate(booking.datum)}</td>
                 <td>
-                  ${formatDate(booking.datum)}
-                </td>
-
-                <td>
-                  ${formatTime(booking.von)}
-                  –
+                  ${formatTime(booking.von)}–
                   ${formatTime(booking.bis)}
                 </td>
-
-                <td>
-                  ${booking.sup}
-                </td>
-
-                <td>
-                  ${formatDuration(
-                    durationMinutes
-                )}
-                </td>
-
-                <td>
-                  ${formatCurrency(price)}
-                </td>
+                <td>${booking.sup}</td>
+                <td>${formatDuration(durationMinutes)}</td>
+                <td>${formatCurrency(price)}</td>
               </tr>
             `;
-        })
-        .join("");
+          })
+          .join("");
 
       billingTotal.textContent =
         formatCurrency(total);
-        printBillingButton.disabled = false;
+
+      createPdfButton.disabled = false;
+    }
+
+    function resetBilling() {
+      billingApartment.value = "";
+      billingDateFrom.value = "";
+      billingDateTo.value = "";
+
+      currentBillingBookings = [];
+
+      billingTotal.textContent =
+        formatCurrency(0);
+
+      createPdfButton.disabled = true;
+
+      billingTableBody.innerHTML = `
+        <tr>
+          <td colspan="5" class="empty-state">
+            Bitte Appartement und Aufenthaltszeitraum auswählen.
+          </td>
+        </tr>
+      `;
+    }
+
+    async function createBillingPdf() {
+      if (
+        currentBillingBookings.length === 0 ||
+        createPdfButton.disabled
+      ) {
+        showMessage(
+          "Bitte zuerst eine Abrechnung berechnen.",
+          "error"
+        );
+
+        return;
       }
 
-      function resetBilling() {
-        billingApartment.value = "";
-        billingDateFrom.value = "";
-        billingDateTo.value = "";
+      createPdfButton.disabled = true;
+      createPdfButton.textContent =
+        "PDF wird erstellt …";
 
-        billingTotal.textContent =
-          formatCurrency(0);
+      try {
+        const response = await fetch(
+          "/api/admin/billing-documents",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-ADMIN-KEY": adminKey,
+            },
+            body: JSON.stringify({
+              appartement:
+                billingApartment.value,
+              datumVon:
+                billingDateFrom.value,
+              datumBis:
+                billingDateTo.value,
+            }),
+          }
+        );
 
-        printBillingButton.disabled = true;  
+        const result =
+          await response
+            .json()
+            .catch(() => ({}));
 
-        billingTableBody.innerHTML = `
-          <tr>
-            <td colspan="5" class="empty-state">
-              Bitte Appartement und Aufenthaltszeitraum auswählen.
-            </td>
-          </tr>
+        if (!response.ok) {
+          throw new Error(
+            result.error ||
+            "Die PDF konnte nicht erstellt werden."
+          );
+        }
+
+        await loadBillingDocuments();
+
+        showMessage(
+          result.message ||
+          "PDF wurde erstellt und gespeichert.",
+          "success"
+        );
+      } catch (error) {
+        console.error(error);
+
+        showMessage(
+          error.message ||
+          "Die PDF konnte nicht erstellt werden.",
+          "error"
+        );
+      } finally {
+        createPdfButton.disabled =
+          currentBillingBookings.length === 0;
+
+        createPdfButton.textContent =
+          "PDF erstellen und speichern";
+      }
+    }
+
+    async function loadBillingDocuments() {
+      documentsList.innerHTML = `
+        <div class="loading">
+          PDF-Liste wird geladen …
+        </div>
+      `;
+
+      const response = await fetch(
+        "/api/admin/billing-documents",
+        {
+          headers: {
+            "X-ADMIN-KEY": adminKey,
+          },
+        }
+      );
+
+      const result =
+        await response
+          .json()
+          .catch(() => []);
+
+      if (!response.ok) {
+        throw new Error(
+          result.error ||
+          "Die gespeicherten PDFs konnten nicht geladen werden."
+        );
+      }
+
+      renderBillingDocuments(
+        Array.isArray(result) ? result : []
+      );
+    }
+
+    function renderBillingDocuments(documents) {
+      documentCount.textContent =
+        documents.length === 1
+          ? "1 PDF"
+          : `${documents.length} PDFs`;
+
+      if (documents.length === 0) {
+        documentsList.innerHTML = `
+          <div class="empty-state">
+            Noch keine Abrechnung gespeichert.
+          </div>
         `;
-      }
-
-      function printBilling() {
-        const selectedApartment =
-          billingApartment.value;
-
-        const dateFrom =
-          billingDateFrom.value;
-
-        const dateTo =
-          billingDateTo.value;
-
-        if (
-          !selectedApartment ||
-          !dateFrom ||
-          !dateTo
-      ) {
-        alert(
-          "Bitte zuerst eine Abrechnung berechnen."
-        );
 
         return;
       }
 
-        const rows =
-          billingTableBody.querySelectorAll("tr");
+      documentsList.innerHTML =
+        documents
+          .map((documentItem) => `
+            <article class="document-card">
+              <h3 class="document-title">
+                ${escapeHtml(documentItem.dateiname)}
+              </h3>
 
-        if (
-          rows.length === 0 ||
-          billingTableBody.querySelector(
-            ".empty-state"
-          )
-      ) {
-        alert(
-          "Für diese Auswahl ist keine Abrechnung vorhanden."
-        );
+              <p class="document-meta">
+                ${escapeHtml(documentItem.appartement)}
+                · ${formatDate(documentItem.datum_von)}
+                bis ${formatDate(documentItem.datum_bis)}
+                <br>
+                Erstellt:
+                ${formatDateTime(documentItem.created_at)}
+              </p>
 
-        return;
+              <div class="document-actions">
+                <button
+                  type="button"
+                  class="secondary-button"
+                  onclick="openPdf(${documentItem.id})"
+                >
+                  Öffnen
+                </button>
+
+                <button
+                  type="button"
+                  class="secondary-button"
+                  onclick="printPdf(${documentItem.id})"
+                >
+                  Drucken
+                </button>
+
+                <button
+                  type="button"
+                  class="secondary-button"
+                  onclick="downloadPdf(
+                    ${documentItem.id},
+                    '${escapeJs(documentItem.dateiname)}'
+                  )"
+                >
+                  Download
+                </button>
+
+                <button
+                  type="button"
+                  class="delete-button"
+                  onclick="deletePdf(
+                    ${documentItem.id},
+                    '${escapeJs(documentItem.dateiname)}'
+                  )"
+                >
+                  Löschen
+                </button>
+              </div>
+            </article>
+          `)
+          .join("");
     }
 
-        const printWindow =
-        window.open("", "_blank");
+    async function getPdfBlob(id) {
+      const response = await fetch(
+        `/api/admin/billing-documents/${id}/pdf`,
+        {
+          headers: {
+            "X-ADMIN-KEY": adminKey,
+          },
+        }
+      );
 
-      if (!printWindow) {
-        alert(
-          "Das Druckfenster wurde blockiert. Bitte Pop-ups für diese Seite erlauben."
+      if (!response.ok) {
+        const result =
+          await response
+            .json()
+            .catch(() => ({}));
+
+        throw new Error(
+          result.error ||
+          "Die PDF konnte nicht geladen werden."
         );
+      }
 
-        return;
+      return response.blob();
     }
 
-      printWindow.document.write(`
-        <!DOCTYPE html>
-        <html lang="de">
-          <head>
-            <meta charset="UTF-8">
+    async function openPdf(id) {
+      try {
+        const blob = await getPdfBlob(id);
+        const url = URL.createObjectURL(blob);
+        const openedWindow =
+          window.open(url, "_blank");
 
-            <title>
-              Abrechnung ${selectedApartment}
-            </title>
+        if (!openedWindow) {
+          URL.revokeObjectURL(url);
 
-            <style>
-              body {
-                padding: 30px;
-                font-family: Arial, sans-serif;
-                color: #18323a;
-              }
+          throw new Error(
+            "Das PDF-Fenster wurde blockiert. Bitte Pop-ups erlauben."
+          );
+        }
 
-              h1 {
-                margin-bottom: 8px;
-              }
+        setTimeout(
+          () => URL.revokeObjectURL(url),
+          60000
+        );
+      } catch (error) {
+        showMessage(error.message, "error");
+      }
+    }
 
-              .billing-info {
-                margin-bottom: 24px;
-                line-height: 1.6;
-              }
+    async function printPdf(id) {
+      try {
+        const blob = await getPdfBlob(id);
+        const url = URL.createObjectURL(blob);
+        const openedWindow =
+          window.open(url, "_blank");
 
-              table {
-                width: 100%;
-                border-collapse: collapse;
-              }
+        if (!openedWindow) {
+          URL.revokeObjectURL(url);
 
-              th,
-              td {
-                padding: 10px;
-                border: 1px solid #cfdadd;
-                text-align: left;
-              }
+          throw new Error(
+            "Das Druckfenster wurde blockiert. Bitte Pop-ups erlauben."
+          );
+        }
 
-              th {
-                background: #edf3f4;
-              }
+        showMessage(
+          "Die PDF wurde geöffnet. Bitte im PDF-Viewer „Drucken“ auswählen.",
+          "success"
+        );
 
-              .total {
-                margin-top: 24px;
-                text-align: right;
-                font-size: 22px;
-                font-weight: bold;
-              }
+        setTimeout(
+          () => URL.revokeObjectURL(url),
+          60000
+        );
+      } catch (error) {
+        showMessage(error.message, "error");
+      }
+    }
 
-              .footer {
-                margin-top: 40px;
-                color: #64777d;
-                font-size: 12px;
-              }
+    async function downloadPdf(id, filename) {
+      try {
+        const blob = await getPdfBlob(id);
+        const url = URL.createObjectURL(blob);
 
-              @media print {
-                body {
-                  padding: 0;
-                }
-              }
-            </style>
-          </head>
+        const link =
+          document.createElement("a");
 
-          <body>
-            <h1>Abrechnung Bootsverleih</h1>
+        link.href = url;
+        link.download = filename;
 
-            <div class="billing-info">
-              <strong>Appartement:</strong>
-                ${selectedApartment}
-              <br>
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
 
-            <strong>Aufenthalt:</strong>
-              ${formatDate(dateFrom)}
-              bis
-              ${formatDate(dateTo)}
-            </div>
+        setTimeout(
+          () => URL.revokeObjectURL(url),
+          1000
+        );
+      } catch (error) {
+        showMessage(error.message, "error");
+      }
+    }
 
-            <table>
-              <thead>
-                <tr>
-                  <th>Datum</th>
-                  <th>Zeit</th>
-                  <th>Gerät</th>
-                  <th>Dauer</th>
-                  <th>Betrag</th>
-                </tr>
-              </thead>
+    async function deletePdf(id, filename) {
+      const confirmed = window.confirm(
+        `${filename}\n\n` +
+        "Diese gespeicherte PDF wirklich löschen?"
+      );
 
-              <tbody>
-                ${billingTableBody.innerHTML}
-              </tbody>
-            </table>
+      if (!confirmed) {
+        return;
+      }
 
-            <div class="total">
-              Gesamt:
-              ${billingTotal.textContent}
-            </div>
+      try {
+        const response = await fetch(
+          `/api/admin/billing-documents/${id}`,
+          {
+            method: "DELETE",
+            headers: {
+              "X-ADMIN-KEY": adminKey,
+            },
+          }
+        );
 
-            <div class="footer">
-              Appartements Bürger
-            </div>
-          </body>
-        </html>
-      `);
+        const result =
+          await response
+            .json()
+            .catch(() => ({}));
 
-      printWindow.document.close();
+        if (!response.ok) {
+          throw new Error(
+            result.error ||
+            "Die PDF konnte nicht gelöscht werden."
+          );
+        }
 
-      printWindow.focus();
+        await loadBillingDocuments();
 
-      setTimeout(() => {
-        printWindow.print();
-      }, 300);
+        showMessage(
+          result.message ||
+          "Die PDF wurde gelöscht.",
+          "success"
+        );
+      } catch (error) {
+        showMessage(error.message, "error");
+      }
+    }
+
+    function formatDateTime(value) {
+      if (!value) {
+        return "";
+      }
+
+      return new Intl.DateTimeFormat(
+        "de-AT",
+        {
+          dateStyle: "short",
+          timeStyle: "short",
+        }
+      ).format(new Date(value));
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function escapeJs(value) {
+      return String(value || "")
+        .replaceAll("\\", "\\\\")
+        .replaceAll("'", "\\'");
     }
 
     function getDeviceClass(deviceName) {
@@ -1460,7 +1709,10 @@
         );
       }
 
-      await loadBookings();
+      await Promise.all([
+        loadBookings(),
+        loadBillingDocuments(),
+      ]);
 
       loginPanel.classList.add("hidden");
       adminArea.classList.remove("hidden");
@@ -1487,8 +1739,15 @@
       loginPanel.classList.remove("hidden");
 
       allBookings = [];
+      currentBillingBookings = [];
+
       bookingTableBody.innerHTML = "";
+      documentsList.innerHTML = "";
+
       updateBookingCount(0);
+      documentCount.textContent = "0 PDFs";
+
+      resetBilling();
     }
 
     async function deleteBooking(booking) {
@@ -1608,29 +1867,32 @@
       resetBilling
     );
 
-    printBillingButton.addEventListener(
+    createPdfButton.addEventListener(
       "click",
-      printBilling
+      createBillingPdf
     );
 
     billingApartment.addEventListener(
       "change",
       () => {
-        printBillingButton.disabled = true;
+        createPdfButton.disabled = true;
+        currentBillingBookings = [];
       }
     );
 
     billingDateFrom.addEventListener(
       "change",
       () => {
-        printBillingButton.disabled = true;
+        createPdfButton.disabled = true;
+        currentBillingBookings = [];
       }
     );
 
     billingDateTo.addEventListener(
       "change",
       () => {
-        printBillingButton.disabled = true;
+        createPdfButton.disabled = true;
+        currentBillingBookings = [];
       }
   );
   </script>
