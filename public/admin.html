@@ -795,57 +795,6 @@
       return hours * 60 + minutes;
     }
 
-    function calculateBookingPrice(booking) {
-      const startMinutes =
-        timeToMinutes(booking.von);
-
-      const endMinutes =
-        timeToMinutes(booking.bis);
-
-      const durationMinutes =
-        endMinutes - startMinutes;
-
-      if (durationMinutes < 60) {
-        return 0;
-      }
-
-      let firstHourPrice = 0;
-      let additionalHalfHourPrice = 0;
-
-      switch (booking.sup) {
-        case "SUP 1":
-        case "SUP 2":
-          firstHourPrice = 5;
-          additionalHalfHourPrice = 2.5;
-        break;
-
-        case "Ruderboot":
-          firstHourPrice = 15;
-          additionalHalfHourPrice = 7.5;
-        break;
-
-        case "Paddelboot":
-          firstHourPrice = 10;
-          additionalHalfHourPrice = 5;
-        break;
-
-        default:
-          return 0;
-      }
-
-      const additionalMinutes =
-        Math.max(0, durationMinutes - 60);
-
-      const additionalHalfHours =
-        Math.ceil(additionalMinutes / 30);
-
-      return (
-        firstHourPrice +
-        additionalHalfHours *
-          additionalHalfHourPrice
-    );
-  }
-
     function formatCurrency(value) {
       return new Intl.NumberFormat(
         "de-AT",
@@ -867,26 +816,119 @@
       return `${hours} Std. ${remainingMinutes} Min.`;
   }
 
-    function calculateBilling() {
-      const selectedApartment =
-        billingApartment.value;
+    function calculateBookingPrice(booking) {
+      const startMinutes =
+        timeToMinutes(booking.von);
 
-      const dateFrom =
-        billingDateFrom.value;
+      const endMinutes =
+        timeToMinutes(booking.bis);
 
-      const dateTo =
-        billingDateTo.value;
+      const durationMinutes =
+        endMinutes - startMinutes;
+
+      if (durationMinutes < 60) {
+        return 0;
+      }
+
+      const firstHourPrice =
+        Number(booking.first_hour_price);
+
+      const additionalHalfHourPrice =
+        Number(booking.additional_half_hour_price);
 
       if (
-        !selectedApartment ||
-        !dateFrom ||
-        !dateTo
+        !Number.isFinite(firstHourPrice) ||
+        !Number.isFinite(additionalHalfHourPrice)
       ) {
+      return 0;
+      }
+
+      const additionalMinutes =
+        Math.max(0, durationMinutes - 60);
+
+      const additionalHalfHours =
+        Math.ceil(additionalMinutes / 30);
+
+      return (
+        firstHourPrice +
+        additionalHalfHours *
+          additionalHalfHourPrice
+     );
+  }
+
+    function renderBillingTable(bookings) {
+      billingTableBody.innerHTML = "";
+
+      if (bookings.length === 0) {
+        billingTableBody.innerHTML = `
+          <tr>
+            <td colspan="5" class="empty-state">
+              Für diese Auswahl wurden keine Buchungen gefunden.
+            </td>
+          </tr>
+        `;
+
+        billingTotal.textContent = formatCurrency(0);
+        createPdfButton.disabled = true;
+        return;
+      }
+
+      let total = 0;
+
+      bookings.forEach((booking) => {
+        const durationMinutes =
+          timeToMinutes(booking.bis) -
+          timeToMinutes(booking.von);
+
+        const amount = calculateBookingPrice(booking);
+        total += amount;
+
+        const row = document.createElement("tr");
+
+        const dateCell = document.createElement("td");
+        dateCell.textContent = formatDate(booking.datum);
+
+        const timeCell = document.createElement("td");
+        timeCell.textContent =
+          `${formatTime(booking.von)}–` +
+          `${formatTime(booking.bis)} Uhr`;
+
+        const deviceCell = document.createElement("td");
+        const deviceBadge = document.createElement("span");
+        deviceBadge.className =
+          `device-badge ${getDeviceClass(booking.sup)}`;
+        deviceBadge.textContent = booking.sup || "–";
+        deviceCell.appendChild(deviceBadge);
+
+        const durationCell = document.createElement("td");
+        durationCell.textContent = formatDuration(durationMinutes);
+
+        const amountCell = document.createElement("td");
+        amountCell.textContent = formatCurrency(amount);
+
+        row.appendChild(dateCell);
+        row.appendChild(timeCell);
+        row.appendChild(deviceCell);
+        row.appendChild(durationCell);
+        row.appendChild(amountCell);
+
+        billingTableBody.appendChild(row);
+      });
+
+      billingTotal.textContent = formatCurrency(total);
+      createPdfButton.disabled = false;
+    }
+
+    function calculateBilling() {
+      const apartment = billingApartment.value;
+      const dateFrom = billingDateFrom.value;
+      const dateTo = billingDateTo.value;
+
+      if (!apartment || !dateFrom || !dateTo) {
         showMessage(
-          "Bitte Appartement und Aufenthaltszeitraum auswählen.",
+          "Bitte Appartement und Aufenthaltszeitraum vollständig auswählen.",
           "error"
         );
-
         return;
       }
 
@@ -895,104 +937,55 @@
           "Das Von-Datum darf nicht nach dem Bis-Datum liegen.",
           "error"
         );
-
         return;
       }
 
-      currentBillingBookings =
-        allBookings
-          .filter((booking) => {
-            const bookingDate =
-              getDateValue(booking.datum);
+      currentBillingBookings = allBookings
+        .filter((booking) => {
+          const bookingDate = getDateValue(booking.datum);
 
-            return (
-              booking.appartement === selectedApartment &&
-              bookingDate >= dateFrom &&
-              bookingDate <= dateTo
+          return (
+            booking.appartement === apartment &&
+            bookingDate >= dateFrom &&
+            bookingDate <= dateTo
+          );
+        })
+        .sort((a, b) => {
+          const dateComparison =
+            getDateValue(a.datum).localeCompare(
+              getDateValue(b.datum)
             );
-          })
-          .sort((a, b) => {
-            const dateComparison =
-              getDateValue(a.datum).localeCompare(
-                getDateValue(b.datum)
-              );
 
-            if (dateComparison !== 0) {
-              return dateComparison;
-            }
+          if (dateComparison !== 0) {
+            return dateComparison;
+          }
 
-            return String(a.von).localeCompare(
-              String(b.von)
-            );
-          });
+          return String(a.von).localeCompare(String(b.von));
+        });
+
+      renderBillingTable(currentBillingBookings);
 
       if (currentBillingBookings.length === 0) {
-        billingTableBody.innerHTML = `
-          <tr>
-            <td colspan="5" class="empty-state">
-              Für diesen Aufenthalt wurden keine Buchungen gefunden.
-            </td>
-          </tr>
-        `;
-
-        billingTotal.textContent =
-          formatCurrency(0);
-
-        createPdfButton.disabled = true;
-
+        showMessage(
+          "Für dieses Appartement und diesen Zeitraum wurden keine Buchungen gefunden.",
+          "error"
+        );
         return;
       }
 
-      let total = 0;
-
-      billingTableBody.innerHTML =
-        currentBillingBookings
-          .map((booking) => {
-            const startMinutes =
-              timeToMinutes(booking.von);
-
-            const endMinutes =
-              timeToMinutes(booking.bis);
-
-            const durationMinutes =
-              endMinutes - startMinutes;
-
-            const price =
-              calculateBookingPrice(booking);
-
-            total += price;
-
-            return `
-              <tr>
-                <td>${formatDate(booking.datum)}</td>
-                <td>
-                  ${formatTime(booking.von)}–
-                  ${formatTime(booking.bis)}
-                </td>
-                <td>${booking.sup}</td>
-                <td>${formatDuration(durationMinutes)}</td>
-                <td>${formatCurrency(price)}</td>
-              </tr>
-            `;
-          })
-          .join("");
-
-      billingTotal.textContent =
-        formatCurrency(total);
-
-      createPdfButton.disabled = false;
+      showMessage(
+        "Die Abrechnung wurde berechnet.",
+        "success"
+      );
     }
 
     function resetBilling() {
       billingApartment.value = "";
       billingDateFrom.value = "";
       billingDateTo.value = "";
-
       currentBillingBookings = [];
 
-      billingTotal.textContent =
-        formatCurrency(0);
-
+      billingTotal.textContent = formatCurrency(0);
       createPdfButton.disabled = true;
 
       billingTableBody.innerHTML = `

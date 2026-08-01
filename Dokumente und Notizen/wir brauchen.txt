@@ -13,6 +13,7 @@ Admin Bereich
 - 	Ausgabe dieser Auswertung auf DIN A4 PDF
 - PDF optisch professioneller gestalten (Logo, Anschrift, sauberer Rechnungskopf)
 
+=====================================================================================================================
 
 Mein Vorschlag
 
@@ -24,8 +25,46 @@ Namen ändern,
 
 ohne im JavaScript oder Servercode Änderungen vornehmen zu müssen.
 
-Das macht die App wesentlich wartungsfreundlicher.
 
-Schick mir einmal den Inhalt deiner server.js (oder zumindest den Bereich mit /api/sups), dann zeige ich dir genau, wo die Liste momentan definiert ist.
+Meine Empfehlung wäre deshalb:
+
+Jetzt die Geräte in die Datenbank umstellen.
+Danach die Preislogik ebenfalls auf die Datenbank umstellen.
+Anschließend die server.js in mehrere Dateien aufteilen.
+
+=======================================================================================================================
+
+Ich habe noch einige Ideen, die richtig Mehrwert bringen würden:
+
+📊 Dashboard mit Umsatzstatistik
+📈 Auslastung je SUP
+🏆 Beliebtestes SUP
+📅 Monatsübersicht
+📧 Rechnung direkt per E-Mail an den Gast senden
+📄 PDF mit fortlaufender Rechnungsnummer
+💳 Bezahlstatus (offen / bezahlt)
+📱 QR-Code auf der Rechnung
+🧾 Export nach Excel
+💶 Jahresumsatz pro Appartement
+
+
+
+=========================================================================================
+
+Wenn du im Adminbereich den Preis von SUP 1 auf 6 € änderst, gilt dieser automatisch:
+
+✔ für neue Buchungen
+✔ für neue Abrechnungen
+✔ für PDF-Erstellung
+
+ohne dass wir den Servercode anfassen müssen.
+
+==========================================================================================
+
+
+
+
+
+
 
 

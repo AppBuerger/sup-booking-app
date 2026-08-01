@@ -2,15 +2,96 @@ Meine Empfehlung für deinen Workflow
 
 Da du sowohl am Stand-PC als auch am Laptop arbeitest, verwende jedes Mal diese Reihenfolge:
 
+=============================================================================================
+
 Vor dem Arbeiten:
 
 cd C:\Users\buerg\SUP_App
 git pull --rebase origin main
 
+============================================================================================
+
 Nach dem Arbeiten:
 
+HAUPTBEREICH
+
 git add .
-git commit -m "Kurze Beschreibung"
+git commit -m "Anpassung PDFErstellung und Download abgeschlossen"
 git push origin main
+
+---------------------------------------------------------------------------------------------
+
+SUBBEREICH GERÄTEVERRWALTUNG
+
+git add .
+git commit -m "Gerätetabelle angelegt"
+git push -u origin geraeteverwaltung
+
+
+============================================================================================
+
+Auf main wechseln:
+
+git checkout main
+
+oder (die neuere Git-Schreibweise):
+
+git switch main
+
+============================================================================================
+
+Zur Geräteentwicklung zurück
+
+git switch geraeteverwaltung
+
+============================================================================================
+
+Prüfen, wo du gerade bist
+git branch
+
+Ausgabe z. B.:
+
+* geraeteverwaltung
+  main
+  neues-layout
+
+Der Stern * zeigt den aktuell aktiven Branch.
+
+============================================================================================
+
+Wichtig: Vor dem Wechsel
+
+Git lässt dich nur dann problemlos wechseln, wenn:
+
+alle Änderungen bereits committed sind oder
+keine Änderungen vorhanden sind.
+
+Deshalb ist dieser Ablauf ideal:
+
+git add .
+git commit -m "Zwischenstand Geräteverwaltung"
+git switch main
+
+Später:
+
+git switch geraeteverwaltung
+
+Du findest exakt den Stand wieder, den du verlassen hast.
+
+=================================================================================================
+
+Änderungen mitnehmen, ohne zu committen (nicht empfohlen)
+
+Falls du noch nicht committen möchtest, kannst du Änderungen "parken":
+
+git stash
+git switch main
+
+Zurück:
+
+git switch geraeteverwaltung
+git stash pop
+
+
 
 So bleiben Laptop, Stand-PC und GitHub immer synchron und du vermeidest die meisten Merge-Konflikte.

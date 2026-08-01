@@ -69,51 +69,6 @@ function formatEuro(value) {
   }).format(value);
 }
 
-function calculateBookingPrice(booking) {
-  const startMinutes = timeToMinutes(booking.von);
-  const endMinutes = timeToMinutes(booking.bis);
-  const durationMinutes = endMinutes - startMinutes;
-
-  if (durationMinutes < 60) {
-    return 0;
-  }
-
-  let firstHourPrice;
-  let additionalHalfHourPrice;
-
-  switch (booking.sup) {
-    case "SUP 1":
-    case "SUP 2":
-      firstHourPrice = 5;
-      additionalHalfHourPrice = 2.5;
-      break;
-
-    case "Ruderboot":
-      firstHourPrice = 15;
-      additionalHalfHourPrice = 7.5;
-      break;
-
-    case "Paddelboot":
-      firstHourPrice = 10;
-      additionalHalfHourPrice = 5;
-      break;
-
-    default:
-      return 0;
-  }
-
-  const additionalMinutes =
-    Math.max(0, durationMinutes - 60);
-
-  const additionalHalfHours =
-    Math.ceil(additionalMinutes / 30);
-
-  return (
-    firstHourPrice +
-    additionalHalfHours * additionalHalfHourPrice
-  );
-}
-
 function createBillingPdf({
   appartement,
   datumVon,
@@ -385,16 +340,30 @@ app.get("/api/bookings/upcoming", async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT
-         id,
-         nachname,
-         appartement,
-         sup,
-         TO_CHAR(datum, 'YYYY-MM-DD') AS datum,
-         TO_CHAR(von, 'HH24:MI') AS von,
-         TO_CHAR(bis, 'HH24:MI') AS bis
-       FROM bookings
-       WHERE datum >= CURRENT_DATE
-       ORDER BY datum ASC, von ASC`
+        b.id,
+        b.nachname,
+        b.appartement,
+        b.sup,
+      TO_CHAR(
+        b.datum,
+        'YYYY-MM-DD'
+      ) AS datum,
+      TO_CHAR(
+        b.von,
+        'HH24:MI'
+      ) AS von,
+      TO_CHAR(
+        b.bis,
+        'HH24:MI'
+      ) AS bis,
+      d.first_hour_price,
+      d.additional_half_hour_price
+    FROM bookings b
+    LEFT JOIN rental_devices d
+      ON d.name = b.sup
+    ORDER BY
+      b.datum ASC,
+      b.von ASC`
     );
 
     return res.json(result.rows);
@@ -469,7 +438,7 @@ if (durationMinutes % 30 !== 0) {
           "Das ausgewählte Gerät ist ungültig oder derzeit nicht verfügbar.",
       });
     }
-
+    
     const conflict = await pool.query(
       `SELECT
          id,
@@ -626,36 +595,36 @@ function formatDuration(minutes) {
 }
 
 function calculateBookingPrice(booking) {
-  const startMinutes = timeToMinutes(booking.von);
-  const endMinutes = timeToMinutes(booking.bis);
-  const durationMinutes = endMinutes - startMinutes;
+  const startMinutes =
+    timeToMinutes(booking.von);
+
+  const endMinutes =
+    timeToMinutes(booking.bis);
+
+  const durationMinutes =
+    endMinutes - startMinutes;
 
   if (durationMinutes < 60) {
     return 0;
   }
 
-  let firstHourPrice = 0;
-  let additionalHalfHourPrice = 0;
+  const firstHourPrice =
+    Number(booking.first_hour_price);
 
-  switch (booking.sup) {
-    case "SUP 1":
-    case "SUP 2":
-      firstHourPrice = 5;
-      additionalHalfHourPrice = 2.5;
-      break;
+  const additionalHalfHourPrice =
+    Number(
+      booking.additional_half_hour_price
+    );
 
-    case "Ruderboot":
-      firstHourPrice = 15;
-      additionalHalfHourPrice = 7.5;
-      break;
-
-    case "Paddelboot":
-      firstHourPrice = 10;
-      additionalHalfHourPrice = 5;
-      break;
-
-    default:
-      return 0;
+  if (
+    !Number.isFinite(firstHourPrice) ||
+    !Number.isFinite(
+      additionalHalfHourPrice
+    )
+  ) {
+    throw new Error(
+      `Für ${booking.sup} sind keine gültigen Preise hinterlegt.`
+    );
   }
 
   const additionalMinutes =
@@ -666,7 +635,8 @@ function calculateBookingPrice(booking) {
 
   return (
     firstHourPrice +
-    additionalHalfHours * additionalHalfHourPrice
+    additionalHalfHours *
+      additionalHalfHourPrice
   );
 }
 
@@ -895,16 +865,31 @@ app.post(
       const bookingsResult =
         await pool.query(
           `SELECT
-             id,
-             appartement,
-             sup,
-             TO_CHAR(datum, 'YYYY-MM-DD') AS datum,
-             TO_CHAR(von, 'HH24:MI') AS von,
-             TO_CHAR(bis, 'HH24:MI') AS bis
-           FROM bookings
-           WHERE appartement = $1
-             AND datum BETWEEN $2 AND $3
-           ORDER BY datum ASC, von ASC`,
+            b.id,
+            b.appartement,
+            b.sup,
+          TO_CHAR(
+            b.datum,
+            'YYYY-MM-DD'
+          ) AS datum,
+          TO_CHAR(
+            b.von,
+            'HH24:MI'
+          ) AS von,
+          TO_CHAR(
+            b.bis,
+            'HH24:MI'
+          ) AS bis,
+          d.first_hour_price,
+          d.additional_half_hour_price
+        FROM bookings b
+        LEFT JOIN rental_devices d
+          ON d.name = b.sup
+        WHERE b.appartement = $1
+          AND b.datum BETWEEN $2 AND $3
+        ORDER BY
+          b.datum ASC,
+          b.von ASC`,
           [
             appartement,
             datumVon,

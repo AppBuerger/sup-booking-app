@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SUP Admin</title>
+
+  <style>
+    :root {
+      --background: #f3f7f8;
+      --surface: #ffffff;
+      --primary: #176b75;
+      --primary-dark: #10545c;
+      --text: #18323a;
+      --muted: #64777d;
+      --border: #d9e3e6;
+      --danger: #b42318;
+      --success-background: #eaf7ef;
+      --error-background: #fdeceb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: Arial, sans-serif;
+      color: var(--text);
+      background: var(--background);
+    }
+
+    .admin-container {
+      width: min(1200px, 100%);
+      margin: 0 auto;
+    }
+
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .admin-header h1 { margin: 0; font-size: 30px; }
+    .admin-header p { margin: 6px 0 0; color: var(--muted); }
+
+    .panel {
+      padding: 24px;
+      margin-bottom: 22px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--surface);
+      box-shadow: 0 8px 24px rgba(24, 50, 58, 0.08);
+    }
+
+    .panel h2 { margin: 0 0 18px; font-size: 21px; }
+    .login-panel { max-width: 420px; }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    label { font-weight: 700; font-size: 14px; }
+
+    input, select {
+      width: 100%;
+      min-height: 43px;
+      padding: 9px 11px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: #fff;
+      color: var(--text);
+      font: inherit;
+    }
+
+    input[type="checkbox"] {
+      width: auto;
+      min-height: auto;
+      transform: scale(1.2);
+    }
+
+    button {
+      min-height: 42px;
+      padding: 9px 15px;
+      border: 0;
+      border-radius: 9px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:disabled { cursor: not-allowed; opacity: 0.65; }
+
+    .primary-button { color: #fff; background: var(--primary); }
+    .primary-button:hover { background: var(--primary-dark); }
+    .secondary-button { color: var(--text); background: #e7eef0; }
+    .delete-button { color: #fff; background: var(--danger); }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .filters, .device-form-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(160px, 1fr));
+      gap: 16px;
+    }
+
+    .device-form-grid {
+      grid-template-columns: repeat(3, minmax(180px, 1fr));
+    }
+
+    .checkbox-row {
+      min-height: 43px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 15px;
+    }
+
+    .section-header h2 { margin: 0; }
+
+    .count {
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: #e6f1f3;
+      color: var(--primary-dark);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 760px;
+      border-collapse: collapse;
+      background: #fff;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th { background: #edf3f4; color: #334d54; font-size: 14px; }
+    tbody tr:last-child td { border-bottom: 0; }
+
+    .device-badge {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 13px;
+      background: #e7eef0;
+    }
+
+    .status-active { color: #1d6b3a; font-weight: 700; }
+    .status-inactive { color: var(--danger); font-weight: 700; }
+
+    .empty-state, .loading {
+      padding: 30px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .message {
+      display: none;
+      margin-bottom: 20px;
+      padding: 12px 15px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    .message.show { display: block; }
+    .message.success { background: var(--success-background); color: #1d6b3a; }
+    .message.error { background: var(--error-background); color: #a01f18; }
+
+    .documents-list { display: grid; gap: 14px; }
+
+    .document-card {
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fbfdfd;
+    }
+
+    .document-title { margin: 0; overflow-wrap: anywhere; font-size: 17px; }
+    .document-meta { margin: 8px 0 0; color: var(--muted); line-height: 1.5; }
+    .hidden { display: none; }
+
+    @media (max-width: 850px) {
+      body { padding: 15px; }
+      .admin-header { flex-direction: column; }
+      .filters, .device-form-grid {
+        grid-template-columns: repeat(2, minmax(150px, 1fr));
+      }
+    }
+
+    @media (max-width: 560px) {
+      .panel { padding: 17px; }
+      .filters, .device-form-grid { grid-template-columns: 1fr; }
+      .section-header { align-items: flex-start; flex-direction: column; }
+      .actions button { width: 100%; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="admin-container">
+    <header class="admin-header">
+      <div>
+        <h1>SUP Admin</h1>
+        <p>Buchungen, Geräte und Abrechnungen verwalten</p>
+      </div>
+    </header>
+
+    <div id="message" class="message"></div>
+
+    <section id="loginPanel" class="panel login-panel">
+      <h2>Admin-Login</h2>
+      <div class="form-group">
+        <label for="adminKey">Admin-Schlüssel</label>
+        <input id="adminKey" type="password" autocomplete="current-password">
+      </div>
+      <div class="actions">
+        <button id="loginButton" class="primary-button" type="button">
+          Anmelden
+        </button>
+      </div>
+    </section>
+
+    <div id="adminArea" class="hidden">
+      <section class="panel">
+        <h2>Buchungen filtern</h2>
+        <div class="filters">
+          <div class="form-group">
+            <label for="dateFrom">Datum von</label>
+            <input id="dateFrom" type="date">
+          </div>
+          <div class="form-group">
+            <label for="dateTo">Datum bis</label>
+            <input id="dateTo" type="date">
+          </div>
+          <div class="form-group">
+            <label for="apartmentFilter">Appartement</label>
+            <select id="apartmentFilter">
+              <option value="">Alle Appartements</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="deviceFilter">Gerät</label>
+            <select id="deviceFilter">
+              <option value="">Alle Geräte</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="filterButton" class="primary-button" type="button">
+            Filter anwenden
+          </button>
+          <button id="resetButton" class="secondary-button" type="button">
+            Filter zurücksetzen
+          </button>
+          <button id="logoutButton" class="secondary-button" type="button">
+            Abmelden
+          </button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="section-header">
+          <h2>Alle Buchungen</h2>
+          <span id="bookingCount" class="count">0 Buchungen</span>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Datum</th>
+                <th>Zeit</th>
+                <th>Appartement</th>
+                <th>Gerät</th>
+                <th>Aktion</th>
+              </tr>
+            </thead>
+            <tbody id="bookingTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="section-header">
+          <h2>Geräteverwaltung</h2>
+          <span id="deviceCount" class="count">0 Geräte</span>
+        </div>
+
+        <form id="deviceForm">
+          <input id="deviceId" type="hidden">
+
+          <div class="device-form-grid">
+            <div class="form-group">
+              <label for="deviceName">Gerätename</label>
+              <input id="deviceName" required>
+            </div>
+
+            <div class="form-group">
+              <label for="deviceCategory">Kategorie</label>
+              <input id="deviceCategory" value="SUP" required>
+            </div>
+
+            <div class="form-group">
+              <label for="firstHourPrice">Preis erste Stunde (€)</label>
+              <input id="firstHourPrice" type="number" min="0" step="0.01" required>
+            </div>
+
+            <div class="form-group">
+              <label for="additionalHalfHourPrice">Weitere 30 Minuten (€)</label>
+              <input id="additionalHalfHourPrice" type="number" min="0" step="0.01" required>
+            </div>
+
+            <div class="form-group">
+              <label for="imageFilename">Bilddatei</label>
+              <input id="imageFilename" placeholder="z. B. sup1.jpg">
+            </div>
+
+            <div class="form-group">
+              <label for="displayOrder">Reihenfolge</label>
+              <input id="displayOrder" type="number" step="1" value="0">
+            </div>
+
+            <div class="form-group">
+              <label>Verfügbarkeit</label>
+              <div class="checkbox-row">
+                <input id="deviceActive" type="checkbox" checked>
+                <span>Gerät aktiv und buchbar</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button id="saveDeviceButton" class="primary-button" type="submit">
+              Neues Gerät speichern
+            </button>
+            <button id="cancelDeviceButton" class="secondary-button" type="button">
+              Eingabe zurücksetzen
+            </button>
+          </div>
+        </form>
+
+        <div class="table-wrapper" style="margin-top:20px">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Kategorie</th>
+                <th>1. Stunde</th>
+                <th>+30 Min.</th>
+                <th>Bild</th>
+                <th>Reihenfolge</th>
+                <th>Status</th>
+                <th>Aktion</th>
+              </tr>
+            </thead>
+            <tbody id="deviceTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="section-header">
+          <h2>Abrechnung</h2>
+          <span id="billingTotal" class="count">€ 0,00</span>
+        </div>
+
+        <div class="filters">
+          <div class="form-group">
+            <label for="billingApartment">Appartement</label>
+            <select id="billingApartment">
+              <option value="">Appartement auswählen</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="billingDateFrom">Aufenthalt von</label>
+            <input id="billingDateFrom" type="date">
+          </div>
+          <div class="form-group">
+            <label for="billingDateTo">Aufenthalt bis</label>
+            <input id="billingDateTo" type="date">
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="calculateBillingButton" class="primary-button" type="button">
+            Abrechnung berechnen
+          </button>
+          <button id="resetBillingButton" class="secondary-button" type="button">
+            Abrechnung zurücksetzen
+          </button>
+          <button id="createPdfButton" class="primary-button" type="button" disabled>
+            PDF erstellen und speichern
+          </button>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Datum</th>
+                <th>Zeit</th>
+                <th>Gerät</th>
+                <th>Dauer</th>
+                <th>Betrag</th>
+              </tr>
+            </thead>
+            <tbody id="billingTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="section-header">
+          <h2>Gespeicherte Abrechnungen</h2>
+          <span id="documentCount" class="count">0 PDFs</span>
+        </div>
+        <div id="documentsList" class="documents-list"></div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    const loginPanel = $("loginPanel");
+    const adminArea = $("adminArea");
+    const adminKeyInput = $("adminKey");
+    const loginButton = $("loginButton");
+    const logoutButton = $("logoutButton");
+    const messageBox = $("message");
+
+    const dateFromInput = $("dateFrom");
+    const dateToInput = $("dateTo");
+    const apartmentFilter = $("apartmentFilter");
+    const deviceFilter = $("deviceFilter");
+    const bookingTableBody = $("bookingTableBody");
+    const bookingCount = $("bookingCount");
+
+    const deviceForm = $("deviceForm");
+    const deviceIdInput = $("deviceId");
+    const deviceNameInput = $("deviceName");
+    const deviceCategoryInput = $("deviceCategory");
+    const firstHourPriceInput = $("firstHourPrice");
+    const additionalHalfHourPriceInput = $("additionalHalfHourPrice");
+    const imageFilenameInput = $("imageFilename");
+    const displayOrderInput = $("displayOrder");
+    const deviceActiveInput = $("deviceActive");
+    const saveDeviceButton = $("saveDeviceButton");
+    const cancelDeviceButton = $("cancelDeviceButton");
+    const deviceTableBody = $("deviceTableBody");
+    const deviceCount = $("deviceCount");
+
+    const billingApartment = $("billingApartment");
+    const billingDateFrom = $("billingDateFrom");
+    const billingDateTo = $("billingDateTo");
+    const billingTableBody = $("billingTableBody");
+    const billingTotal = $("billingTotal");
+    const createPdfButton = $("createPdfButton");
+    const documentsList = $("documentsList");
+    const documentCount = $("documentCount");
+
+    let adminKey = "";
+    let allBookings = [];
+    let allDevices = [];
+    let currentBillingBookings = [];
+    let messageTimer;
+
+    const billingApartments = [
+      "Top 1", "Top 2", "Top 3", "Top 4", "Top 5",
+      "Top 11", "Top 12", "Top 13", "Top 14"
+    ];
+
+    billingApartments.forEach((apartment) => {
+      billingApartment.appendChild(createOption(apartment, apartment));
+    });
+
+    function showMessage(text, type = "success") {
+      clearTimeout(messageTimer);
+      messageBox.textContent = text;
+      messageBox.className = `message show ${type}`;
+
+      messageTimer = setTimeout(() => {
+        messageBox.className = "message";
+        messageBox.textContent = "";
+      }, 5000);
+    }
+
+    function getDateValue(value) {
+      return value ? String(value).split("T")[0] : "";
+    }
+
+    function formatDate(value) {
+      const dateValue = getDateValue(value);
+      if (!dateValue) return "";
+
+      const [year, month, day] = dateValue.split("-");
+      return `${day}.${month}.${year}`;
+    }
+
+    function formatTime(value) {
+      return value ? String(value).slice(0, 5) : "";
+    }
+
+    function formatCurrency(value) {
+      return new Intl.NumberFormat("de-AT", {
+        style: "currency",
+        currency: "EUR",
+      }).format(value);
+    }
+
+    function timeToMinutes(value) {
+      const [hours, minutes] = String(value || "00:00")
+        .slice(0, 5)
+        .split(":")
+        .map(Number);
+
+      return hours * 60 + minutes;
+    }
+
+    function formatDuration(minutes) {
+      const hours = Math.floor(minutes / 60);
+      const remaining = minutes % 60;
+
+      return remaining === 0
+        ? `${hours} Std.`
+        : `${hours} Std. ${remaining} Min.`;
+    }
+
+    function calculateBookingPrice(booking) {
+      const duration =
+        timeToMinutes(booking.bis) - timeToMinutes(booking.von);
+
+      if (duration < 60) return 0;
+
+      const first = Number(booking.first_hour_price);
+      const additional = Number(
+        booking.additional_half_hour_price
+      );
+
+      if (!Number.isFinite(first) || !Number.isFinite(additional)) {
+        return 0;
+      }
+
+      return first +
+        Math.ceil(Math.max(0, duration - 60) / 30) * additional;
+    }
+
+    function createOption(value, text) {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = text;
+      return option;
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function escapeJs(value) {
+      return String(value || "")
+        .replaceAll("\\", "\\\\")
+        .replaceAll("'", "\\'");
+    }
+
+    async function apiFetch(url, options = {}) {
+      const headers = {
+        ...(options.headers || {}),
+        "X-ADMIN-KEY": adminKey,
+      };
+
+      const response = await fetch(url, {
+        ...options,
+        headers,
+      });
+
+      const result = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          logout();
+        }
+
+        throw new Error(
+          result.error ||
+          result.message ||
+          "Die Anfrage ist fehlgeschlagen."
+        );
+      }
+
+      return result;
+    }
+
+    function fillFilterOptions() {
+      const selectedApartment = apartmentFilter.value;
+      const selectedDevice = deviceFilter.value;
+
+      const apartments = [...new Set(
+        allBookings.map((item) => item.appartement).filter(Boolean)
+      )].sort((a, b) =>
+        String(a).localeCompare(String(b), "de", { numeric: true })
+      );
+
+      apartmentFilter.innerHTML =
+        '<option value="">Alle Appartements</option>';
+
+      apartments.forEach((value) => {
+        apartmentFilter.appendChild(createOption(value, value));
+      });
+
+      deviceFilter.innerHTML =
+        '<option value="">Alle Geräte</option>';
+
+      allDevices.forEach((device) => {
+        deviceFilter.appendChild(
+          createOption(String(device.id), device.name)
+        );
+      });
+
+      apartmentFilter.value =
+        apartments.includes(selectedApartment)
+          ? selectedApartment
+          : "";
+
+      deviceFilter.value =
+        allDevices.some(
+          (device) => String(device.id) === selectedDevice
+        )
+          ? selectedDevice
+          : "";
+    }
+
+    function getFilteredBookings() {
+      const dateFrom = dateFromInput.value;
+      const dateTo = dateToInput.value;
+      const selectedApartment = apartmentFilter.value;
+      const selectedDevice = deviceFilter.value;
+
+      return allBookings.filter((booking) => {
+        const date = getDateValue(booking.datum);
+
+        return !(
+          (dateFrom && date < dateFrom) ||
+          (dateTo && date > dateTo) ||
+          (selectedApartment &&
+            booking.appartement !== selectedApartment) ||
+          (selectedDevice &&
+            String(booking.device_id) !== selectedDevice)
+        );
+      });
+    }
+
+    function renderBookings(bookings) {
+      bookingCount.textContent =
+        bookings.length === 1
+          ? "1 Buchung"
+          : `${bookings.length} Buchungen`;
+
+      if (bookings.length === 0) {
+        bookingTableBody.innerHTML =
+          '<tr><td colspan="5" class="empty-state">' +
+          "Für diese Auswahl wurden keine Buchungen gefunden." +
+          "</td></tr>";
+        return;
+      }
+
+      bookingTableBody.innerHTML = "";
+
+      bookings
+        .sort((a, b) =>
+          `${getDateValue(a.datum)} ${a.von}`
+            .localeCompare(`${getDateValue(b.datum)} ${b.von}`)
+        )
+        .forEach((booking) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${formatDate(booking.datum)}</td>
+            <td>${formatTime(booking.von)}–${formatTime(booking.bis)} Uhr</td>
+            <td>${escapeHtml(booking.appartement)}</td>
+            <td><span class="device-badge">${escapeHtml(
+              booking.device_name || booking.sup
+            )}</span></td>
+            <td></td>
+          `;
+
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "delete-button";
+          button.textContent = "Löschen";
+          button.addEventListener("click", () => deleteBooking(booking));
+
+          row.lastElementChild.appendChild(button);
+          bookingTableBody.appendChild(row);
+        });
+    }
+
+    async function loadBookings() {
+      const response = await fetch("/api/bookings");
+      const result = await response.json().catch(() => []);
+
+      if (!response.ok) {
+        throw new Error(
+          result.message || "Die Buchungen konnten nicht geladen werden."
+        );
+      }
+
+      allBookings = Array.isArray(result) ? result : [];
+      fillFilterOptions();
+      renderBookings(getFilteredBookings());
+    }
+
+    async function deleteBooking(booking) {
+      if (!confirm(
+        `${booking.device_name || booking.sup}\n` +
+        `${booking.appartement}\n` +
+        `${formatDate(booking.datum)}\n` +
+        `${formatTime(booking.von)}–${formatTime(booking.bis)} Uhr\n\n` +
+        "Diese Buchung wirklich löschen?"
+      )) return;
+
+      const result = await apiFetch(
+        `/api/admin/delete/${booking.id}`,
+        { method: "DELETE" }
+      );
+
+      await loadBookings();
+      showMessage(result.message || "Die Buchung wurde gelöscht.");
+    }
+
+    function resetDeviceForm() {
+      deviceForm.reset();
+      deviceIdInput.value = "";
+      deviceCategoryInput.value = "SUP";
+      displayOrderInput.value = "0";
+      deviceActiveInput.checked = true;
+      saveDeviceButton.textContent = "Neues Gerät speichern";
+    }
+
+    function editDevice(device) {
+      deviceIdInput.value = device.id;
+      deviceNameInput.value = device.name;
+      deviceCategoryInput.value = device.category;
+      firstHourPriceInput.value = device.first_hour_price;
+      additionalHalfHourPriceInput.value =
+        device.additional_half_hour_price;
+      imageFilenameInput.value = device.image_filename || "";
+      displayOrderInput.value = device.display_order;
+      deviceActiveInput.checked = Boolean(device.is_active);
+      saveDeviceButton.textContent = "Änderungen speichern";
+      deviceNameInput.focus();
+    }
+
+    function renderDevices() {
+      deviceCount.textContent =
+        allDevices.length === 1
+          ? "1 Gerät"
+          : `${allDevices.length} Geräte`;
+
+      if (allDevices.length === 0) {
+        deviceTableBody.innerHTML =
+          '<tr><td colspan="8" class="empty-state">' +
+          "Noch keine Geräte vorhanden." +
+          "</td></tr>";
+        return;
+      }
+
+      deviceTableBody.innerHTML = "";
+
+      allDevices.forEach((device) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${escapeHtml(device.name)}</td>
+          <td>${escapeHtml(device.category)}</td>
+          <td>${formatCurrency(device.first_hour_price)}</td>
+          <td>${formatCurrency(device.additional_half_hour_price)}</td>
+          <td>${escapeHtml(device.image_filename || "–")}</td>
+          <td>${device.display_order}</td>
+          <td class="${
+            device.is_active ? "status-active" : "status-inactive"
+          }">${device.is_active ? "Aktiv" : "Inaktiv"}</td>
+          <td></td>
+        `;
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "secondary-button";
+        button.textContent = "Bearbeiten";
+        button.addEventListener("click", () => editDevice(device));
+
+        row.lastElementChild.appendChild(button);
+        deviceTableBody.appendChild(row);
+      });
+    }
+
+    async function loadDevices() {
+      const result = await apiFetch("/api/admin/devices");
+      allDevices = Array.isArray(result) ? result : [];
+      renderDevices();
+      fillFilterOptions();
+    }
+
+    deviceForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const id = deviceIdInput.value;
+      const body = {
+        name: deviceNameInput.value.trim(),
+        category: deviceCategoryInput.value.trim(),
+        first_hour_price: Number(firstHourPriceInput.value),
+        additional_half_hour_price:
+          Number(additionalHalfHourPriceInput.value),
+        image_filename: imageFilenameInput.value.trim(),
+        display_order: Number(displayOrderInput.value),
+        is_active: deviceActiveInput.checked,
+      };
+
+      saveDeviceButton.disabled = true;
+
+      try {
+        const result = await apiFetch(
+          id ? `/api/admin/devices/${id}` : "/api/admin/devices",
+          {
+            method: id ? "PUT" : "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          }
+        );
+
+        resetDeviceForm();
+        await Promise.all([loadDevices(), loadBookings()]);
+        showMessage(result.message || "Das Gerät wurde gespeichert.");
+      } catch (error) {
+        showMessage(error.message, "error");
+      } finally {
+        saveDeviceButton.disabled = false;
+      }
+    });
+
+    function renderBillingTable(bookings) {
+      if (bookings.length === 0) {
+        billingTableBody.innerHTML =
+          '<tr><td colspan="5" class="empty-state">' +
+          "Für diese Auswahl wurden keine Buchungen gefunden." +
+          "</td></tr>";
+        billingTotal.textContent = formatCurrency(0);
+        createPdfButton.disabled = true;
+        return;
+      }
+
+      let total = 0;
+      billingTableBody.innerHTML = "";
+
+      bookings.forEach((booking) => {
+        const duration =
+          timeToMinutes(booking.bis) - timeToMinutes(booking.von);
+        const amount = calculateBookingPrice(booking);
+        total += amount;
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${formatDate(booking.datum)}</td>
+          <td>${formatTime(booking.von)}–${formatTime(booking.bis)} Uhr</td>
+          <td>${escapeHtml(booking.device_name || booking.sup)}</td>
+          <td>${formatDuration(duration)}</td>
+          <td>${formatCurrency(amount)}</td>
+        `;
+        billingTableBody.appendChild(row);
+      });
+
+      billingTotal.textContent = formatCurrency(total);
+      createPdfButton.disabled = false;
+    }
+
+    function calculateBilling() {
+      const apartment = billingApartment.value;
+      const from = billingDateFrom.value;
+      const to = billingDateTo.value;
+
+      if (!apartment || !from || !to) {
+        showMessage(
+          "Bitte Appartement und Aufenthaltszeitraum vollständig auswählen.",
+          "error"
+        );
+        return;
+      }
+
+      if (from > to) {
+        showMessage(
+          "Das Von-Datum darf nicht nach dem Bis-Datum liegen.",
+          "error"
+        );
+        return;
+      }
+
+      currentBillingBookings = allBookings.filter((booking) => {
+        const date = getDateValue(booking.datum);
+
+        return (
+          booking.appartement === apartment &&
+          date >= from &&
+          date <= to
+        );
+      });
+
+      renderBillingTable(currentBillingBookings);
+
+      if (currentBillingBookings.length === 0) {
+        showMessage(
+          "Für diese Auswahl wurden keine Buchungen gefunden.",
+          "error"
+        );
+      } else {
+        showMessage("Die Abrechnung wurde berechnet.");
+      }
+    }
+
+    function resetBilling() {
+      billingApartment.value = "";
+      billingDateFrom.value = "";
+      billingDateTo.value = "";
+      currentBillingBookings = [];
+      billingTotal.textContent = formatCurrency(0);
+      createPdfButton.disabled = true;
+      billingTableBody.innerHTML =
+        '<tr><td colspan="5" class="empty-state">' +
+        "Bitte Appartement und Aufenthaltszeitraum auswählen." +
+        "</td></tr>";
+    }
+
+    async function createBillingPdf() {
+      if (currentBillingBookings.length === 0) {
+        showMessage("Bitte zuerst eine Abrechnung berechnen.", "error");
+        return;
+      }
+
+      createPdfButton.disabled = true;
+
+      try {
+        const result = await apiFetch(
+          "/api/admin/billing-documents",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              appartement: billingApartment.value,
+              datumVon: billingDateFrom.value,
+              datumBis: billingDateTo.value,
+            }),
+          }
+        );
+
+        await loadBillingDocuments();
+        showMessage(result.message || "PDF wurde erstellt.");
+      } catch (error) {
+        showMessage(error.message, "error");
+      } finally {
+        createPdfButton.disabled =
+          currentBillingBookings.length === 0;
+      }
+    }
+
+    function formatDateTime(value) {
+      return value
+        ? new Intl.DateTimeFormat("de-AT", {
+            dateStyle: "short",
+            timeStyle: "short",
+          }).format(new Date(value))
+        : "";
+    }
+
+    async function loadBillingDocuments() {
+      const result = await apiFetch(
+        "/api/admin/billing-documents"
+      );
+
+      const documents = Array.isArray(result) ? result : [];
+
+      documentCount.textContent =
+        documents.length === 1
+          ? "1 PDF"
+          : `${documents.length} PDFs`;
+
+      if (documents.length === 0) {
+        documentsList.innerHTML =
+          '<div class="empty-state">Noch keine Abrechnung gespeichert.</div>';
+        return;
+      }
+
+      documentsList.innerHTML = documents.map((item) => `
+        <article class="document-card">
+          <h3 class="document-title">${escapeHtml(item.dateiname)}</h3>
+          <p class="document-meta">
+            ${escapeHtml(item.appartement)}
+            · ${formatDate(item.datum_von)} bis ${formatDate(item.datum_bis)}
+            <br>Erstellt: ${formatDateTime(item.created_at)}
+          </p>
+          <div class="actions">
+            <button class="secondary-button" type="button"
+              onclick="openPdf(${item.id})">Öffnen</button>
+            <button class="secondary-button" type="button"
+              onclick="downloadPdf(${item.id}, '${escapeJs(item.dateiname)}')">
+              Download
+            </button>
+            <button class="delete-button" type="button"
+              onclick="deletePdf(${item.id}, '${escapeJs(item.dateiname)}')">
+              Löschen
+            </button>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    async function getPdfBlob(id) {
+      const response = await fetch(
+        `/api/admin/billing-documents/${id}/pdf`,
+        { headers: { "X-ADMIN-KEY": adminKey } }
+      );
+
+      if (!response.ok) {
+        const result = await response.json().catch(() => ({}));
+        throw new Error(
+          result.error || "Die PDF konnte nicht geladen werden."
+        );
+      }
+
+      return response.blob();
+    }
+
+    async function openPdf(id) {
+      try {
+        const blob = await getPdfBlob(id);
+        const url = URL.createObjectURL(blob);
+        const opened = window.open(url, "_blank");
+
+        if (!opened) {
+          URL.revokeObjectURL(url);
+          throw new Error("Bitte Pop-ups für diese Seite erlauben.");
+        }
+
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+      } catch (error) {
+        showMessage(error.message, "error");
+      }
+    }
+
+    async function downloadPdf(id, filename) {
+      try {
+        const blob = await getPdfBlob(id);
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      } catch (error) {
+        showMessage(error.message, "error");
+      }
+    }
+
+    async function deletePdf(id, filename) {
+      if (!confirm(`${filename}\n\nDiese PDF wirklich löschen?`)) return;
+
+      try {
+        const result = await apiFetch(
+          `/api/admin/billing-documents/${id}`,
+          { method: "DELETE" }
+        );
+
+        await loadBillingDocuments();
+        showMessage(result.message || "Die PDF wurde gelöscht.");
+      } catch (error) {
+        showMessage(error.message, "error");
+      }
+    }
+
+    async function login() {
+      const enteredKey = adminKeyInput.value.trim();
+
+      if (!enteredKey) {
+        showMessage("Bitte gib den Admin-Schlüssel ein.", "error");
+        return;
+      }
+
+      adminKey = enteredKey;
+      loginButton.disabled = true;
+
+      try {
+        await apiFetch("/api/admin/check");
+
+        await Promise.all([
+          loadDevices(),
+          loadBookings(),
+          loadBillingDocuments(),
+        ]);
+
+        loginPanel.classList.add("hidden");
+        adminArea.classList.remove("hidden");
+        resetBilling();
+      } catch (error) {
+        showMessage(error.message, "error");
+      } finally {
+        loginButton.disabled = false;
+      }
+    }
+
+    function logout() {
+      adminKey = "";
+      adminKeyInput.value = "";
+      allBookings = [];
+      allDevices = [];
+      currentBillingBookings = [];
+      adminArea.classList.add("hidden");
+      loginPanel.classList.remove("hidden");
+    }
+
+    $("filterButton").addEventListener("click", () => {
+      if (
+        dateFromInput.value &&
+        dateToInput.value &&
+        dateFromInput.value > dateToInput.value
+      ) {
+        showMessage(
+          "Das Von-Datum darf nicht nach dem Bis-Datum liegen.",
+          "error"
+        );
+        return;
+      }
+
+      renderBookings(getFilteredBookings());
+    });
+
+    $("resetButton").addEventListener("click", () => {
+      dateFromInput.value = "";
+      dateToInput.value = "";
+      apartmentFilter.value = "";
+      deviceFilter.value = "";
+      renderBookings(allBookings);
+    });
+
+    loginButton.addEventListener("click", login);
+    logoutButton.addEventListener("click", logout);
+    cancelDeviceButton.addEventListener("click", resetDeviceForm);
+    $("calculateBillingButton").addEventListener("click", calculateBilling);
+    $("resetBillingButton").addEventListener("click", resetBilling);
+    createPdfButton.addEventListener("click", createBillingPdf);
+
+    adminKeyInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") login();
+    });
+
+    [dateFromInput, dateToInput, apartmentFilter, deviceFilter]
+      .forEach((element) =>
+        element.addEventListener("change", () =>
+          renderBookings(getFilteredBookings())
+        )
+      );
+  </script>
+</body>
+</html>
