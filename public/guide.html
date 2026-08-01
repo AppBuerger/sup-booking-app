@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="description"
+    content="Digitaler Gästeguide der Appartements Bürger"
+  >
+
+  <title>Digitaler Gästeguide | Appartements Bürger</title>
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="guide.css">
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="header-content">
+      <div class="brand">
+        <img
+          src="./images/Logo_neu_App.png?v=3"
+          alt="Appartements Bürger"
+          class="site-logo"
+        >
+
+        <div class="brand-text">
+          <p class="hero-eyebrow">Appartements Bürger</p>
+          <h1>Digitaler Gästeguide</h1>
+        </div>
+      </div>
+
+      <nav class="header-actions" aria-label="Seitennavigation">
+        <a class="admin-link" href="index.html">
+          SUP &amp; Boot
+        </a>
+
+        <a class="admin-link" href="admin.html">
+          Admin
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="guide-container">
+    <section class="guide-welcome">
+      <div class="guide-welcome-content">
+        <p class="eyebrow">Willkommen</p>
+
+        <h2>Schön, dass Sie bei uns sind!</h2>
+
+        <p>
+          In unserem digitalen Gästeguide finden Sie wichtige Informationen
+          zu Ihrem Aufenthalt, zur Ausstattung unserer Appartements und zu
+          Angeboten in der Umgebung.
+        </p>
+      </div>
+
+      <div class="guide-quick-actions">
+        <a class="guide-primary-button" href="index.html">
+          SUP oder Boot buchen
+        </a>
+
+        <a class="guide-secondary-button" href="#kontakt">
+          Kontakt aufnehmen
+        </a>
+      </div>
+    </section>
+
+    <section class="guide-search-section" aria-labelledby="guideSearchHeading">
+      <div>
+        <p class="eyebrow">Schnell finden</p>
+        <h2 id="guideSearchHeading">Wonach suchen Sie?</h2>
+      </div>
+
+      <label class="guide-search">
+        <span class="sr-only">Gästeguide durchsuchen</span>
+
+        <input
+          type="search"
+          id="guideSearch"
+          placeholder="Zum Beispiel WLAN, Müll, Parkplatz oder Arzt"
+          autocomplete="off"
+        >
+      </label>
+
+      <p
+        id="searchResultMessage"
+        class="guide-search-message"
+        aria-live="polite"
+      ></p>
+    </section>
+
+    <section class="guide-grid" id="guideGrid">
+
+      <article
+        class="guide-card"
+        data-search="wlan wifi internet passwort netzwerk zugang"
+      >
+        <div class="guide-card-icon" aria-hidden="true">📶</div>
+
+        <div class="guide-card-content">
+          <p class="eyebrow">Im Appartement</p>
+          <h2>WLAN und Internet</h2>
+
+          <p>
+            Hier finden Sie den Namen unseres WLAN-Netzwerks und das
+            zugehörige Passwort.
+          </p>
+
+          <details>
+            <summary>WLAN-Daten anzeigen</summary>
+
+            <div class="guide-detail-content">
+              <p>
+                <strong>WLAN-Name:</strong>
+                <span>[WLAN-NAME EINFÜGEN]</span>
+              </p>
+
+              <p>
+                <strong>Passwort:</strong>
+                <span>[WLAN-PASSWORT EINFÜGEN]</span>
+              </p>
+
+              <p class="guide-note">
+                Bitte geben Sie die Zugangsdaten nicht an außenstehende
+                Personen weiter.
+              </p>
+            </div>
+          </details>
+        </div>
+      </article>
+
+      <article
+        class="guide-card"
+        data-search="check-in anreise ankommen schlüssel appartement bezug"
+      >
+        <div class="guide-card-icon" aria-hidden="true">🔑</div>
+
+        <div class="guide-card-content">
+          <p class="eyebrow">Anreise</p>
+          <h2>Check-in</h2>
+
+          <p>
+            Informationen zur Ankunft, Schlüsselübergabe und zum Bezug Ihres
+            Appartements.
+          </p>
+
+          <details>
+            <summary>Check-in-Informationen anzeigen</summary>
+
+            <div class="guide-detail-content">
+              <p>
+                Der Check-in ist ab
+                <strong>[UHRZEIT EINFÜGEN]</strong>
+                möglich.
+              </p>
+
+              <p>
+                [INFORMATIONEN ZUR SCHLÜSSELÜBERGABE EINFÜGEN]
+              </p>
+            </div>
+          </details>
+        </div>
+      </article>
+
+      <article
+        class="guide-card"
+        data-search="check-out abreise verlassen schlüssel müll abreisetag"
+      >
+        <div class="guide-card-icon" aria-hidden="true">🧳</div>
+
+        <div class="guide-card-content">
+          <p class="eyebrow">Abreise</p>
+          <h2>Check-out</h2>
+
+          <p>
+            Bitte beachten Sie unsere Hinweise für eine unkomplizierte
+            Abreise.
+          </p>
+
+          <details>
+            <summary>Check-out-Informationen anzeigen</summary>
+
+            <div class="guide-detail-content">
+              <p>
+                Das Appartement ist am Abreisetag bis
+                <strong>[UHRZEIT EINFÜGEN]</strong>
+                freizugeben.
+              </p>
+
+              <ul>
+                <li>[SCHLÜSSELRÜCKGABE EINFÜGEN]</li>
+                <li>[MÜLLENTSORGUNG EINFÜGEN]</li>
+                <li>[WEITERE HINWEISE EINFÜGEN]</li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </article>
+
+      <article
+        class="guide-card"
+        data-search="parken parkplatz auto fahrzeug stellplatz"
+      >
+        <div class="guide-card-icon" aria-hidden="true">🚗</div>
+
+        <div class="guide-card-content">
+          <p class="eyebrow">Rund ums Haus</p>
+          <h2>Parken</h2>
+
+          <p>
+            Informationen zu den Parkmöglichkeiten bei den Appartements.
+          </p>
+
+          <details>
+            <summary>Parkinformationen anzeigen</summary>
+
+            <div class="guide-detail-content">
+              <p>
+                [BESCHREIBUNG DER PARKPLÄTZE EINFÜGEN]
+              </p>
+
+              <p class="guide-note">
+                Bitte halten Sie Einfahrten und gekennzeichnete Bereiche frei.
+              </p>
+            </div>
+          </details>
+        </div>
+      </article>
+
+      <article
+        class="guide-card"
+        data-search="müll abfall trennung glas papier biomüll restmüll entsorgung"
+      >
+        <div class="guide-card-icon" aria-hidden="true">♻️</div>
+
+        <div class="guide-card-content">
+          <p class="eyebrow">Rund ums Haus</p>
+          <h2>Mülltrennung</h2>
+
+          <p>
+            Helfen Sie uns bitte bei der richtigen Trennung und Entsorgung
+            des Abfalls.
+          </p>
+
+          <details>
+            <summary>Mülltrennung anzeigen</summary>
+
+            <div class="guide-detail-content">
+              <ul>
+                <li><strong>Restmüll:</strong> [INFORMATION EINFÜGEN]</li>
+                <li><strong>Biomüll:</strong> [INFORMATION EINFÜGEN]</li>
+                <li><strong>Papier:</strong> [INFORMATION EINFÜGEN]</li>
+                <li><strong>Glas:</strong> [INFORMATION EINFÜGEN]</li>
+                <li><strong>Verpackungen:</strong> [INFORMATION EINFÜGEN]</li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </article>
+
+      <article
+        class="guide-card"
+        data-search="ausstattung bedienung fernseher tv kaffeemaschine küche geräte"
+      >
+        <div class="guide-card-icon" aria-hidden="true">🏠</div>
+
+        <div class="guide-card-content">
+          <p class="eyebrow">Im Appartement</p>
+          <h2>Ausstattung und Bedienung</h2>
+
+          <p>
+            Kurze Hilfestellungen zu den Geräten und zur Ausstattung Ihres
+            Appartements.
+          </p>
+
+          <details>
+            <summary>Bedienungshinweise anzeigen</summary>
+
+            <div class="guide-detail-content">
+              <h3>Fernseher</h3>
+              <p>[BEDIENUNGSHINWEIS EINFÜGEN]</p>
+
+              <h3>Kaffeemaschine</h3>
+              <p>[BEDIENUNGSHINWEIS EINFÜGEN]</p>
+
+              <h3>Weitere Geräte</h3>
+              <p>[BEDIENUNGSHINWEIS EINFÜGEN]</p>
+            </div>
+          </details>
+        </div>
+      </article>
+
+      <article
+        class="guide-card"
+        data-search="sup boot buchen verleih reservierung wasser sport"
+      >
+        <div class="guide-card-icon" aria-hidden="true">🏄</div>
+
+        <div class="guide-card-content">
+          <p class="eyebrow">Für unsere Gäste</p>
+          <h2>SUP- und Bootsverleih</h2>
+
+          <p>
+            Unsere Gäste können die verfügbaren SUPs und das Boot direkt
+            online reservieren.
+          </p>
+
+          <a class="guide-card-link" href="index.html">
+            Zur Buchung
+          </a>
+        </div>
+      </article>
+
+      <article
+        class="guide-card"
+        data-search="wörthersee plus card kärnten card ausflüge app tourismusverband ermäßigung"
+      >
+        <div class="guide-card-icon" aria-hidden="true">☀️</div>
+
+        <div class="guide-card-content">
+          <p class="eyebrow">Freizeit</p>
+          <h2>Wörthersee Plus Card</h2>
+
+          <p>
+            Mit der Wörthersee Plus Card erhalten unsere Gäste zahlreiche
+            Vorteile und Ermäßigungen in der Region.
+          </p>
+
+          <details>
+            <summary>Weitere Informationen anzeigen</summary>
+
+            <div class="guide-detail-content">
+              <p>
+                Für Ausflugsziele, Veranstaltungen und aktuelle Angebote
+                empfehlen wir die offizielle App zur Wörthersee Plus Card.
+              </p>
+
+              <p>
+                [SPÄTER LINK ZUR OFFIZIELLEN APP ODER WEBSITE EINFÜGEN]
+              </p>
+            </div>
+          </details>
+        </div>
+      </article>
+
+      <article
+        class="guide-card"
+        data-search="restaurant essen frühstück einkaufen supermarkt empfehlung geheimtipp"
+      >
+        <div class="guide-card-icon" aria-hidden="true">🍽️</div>
+
+        <div class="guide-card-content">
+          <p class="eyebrow">Unsere Tipps</p>
+          <h2>Persönliche Empfehlungen</h2>
+
+          <p>
+            Restaurants, Einkaufsmöglichkeiten und besondere Plätze, die wir
+            Ihnen gerne empfehlen.
+          </p>
+
+          <details>
+            <summary>Empfehlungen anzeigen</summary>
+
+            <div class="guide-detail-content">
+              <h3>Restaurants</h3>
+              <p>[RESTAURANTEMPFEHLUNGEN EINFÜGEN]</p>
+
+              <h3>Frühstück und Gebäck</h3>
+              <p>[EMPFEHLUNGEN EINFÜGEN]</p>
+
+              <h3>Einkaufen</h3>
+              <p>[EINKAUFSMÖGLICHKEITEN EINFÜGEN]</p>
+
+              <h3>Unsere Geheimtipps</h3>
+              <p>[PERSÖNLICHE TIPPS EINFÜGEN]</p>
+            </div>
+          </details>
+        </div>
+      </article>
+
+      <article
+        class="guide-card"
+        data-search="arzt ärzte apotheke krankenhaus gesundheit notfall rettung polizei feuerwehr"
+      >
+        <div class="guide-card-icon" aria-hidden="true">🩺</div>
+
+        <div class="guide-card-content">
+          <p class="eyebrow">Wichtige Hilfe</p>
+          <h2>Ärzte, Apotheke und Notfälle</h2>
+
+          <p>
+            Wichtige Telefonnummern und Anlaufstellen für medizinische oder
+            andere Notfälle.
+          </p>
+
+          <details>
+            <summary>Notfallinformationen anzeigen</summary>
+
+            <div class="guide-detail-content">
+              <ul class="emergency-list">
+                <li>
+                  <strong>Euro-Notruf:</strong>
+                  <a href="tel:112">112</a>
+                </li>
+
+                <li>
+                  <strong>Feuerwehr:</strong>
+                  <a href="tel:122">122</a>
+                </li>
+
+                <li>
+                  <strong>Polizei:</strong>
+                  <a href="tel:133">133</a>
+                </li>
+
+                <li>
+                  <strong>Rettung:</strong>
+                  <a href="tel:144">144</a>
+                </li>
+
+                <li>
+                  <strong>Ärztefunkdienst:</strong>
+                  <a href="tel:141">141</a>
+                </li>
+
+                <li>
+                  <strong>Gesundheitsberatung:</strong>
+                  <a href="tel:1450">1450</a>
+                </li>
+              </ul>
+
+              <h3>Arzt in der Nähe</h3>
+              <p>[ARZT UND KONTAKTDATEN EINFÜGEN]</p>
+
+              <h3>Apotheke in der Nähe</h3>
+              <p>[APOTHEKE UND KONTAKTDATEN EINFÜGEN]</p>
+            </div>
+          </details>
+        </div>
+      </article>
+
+      <article
+        class="guide-card guide-card--contact"
+        id="kontakt"
+        data-search="kontakt telefon whatsapp nachricht vermieter gastgeber hilfe frage"
+      >
+        <div class="guide-card-icon" aria-hidden="true">💬</div>
+
+        <div class="guide-card-content">
+          <p class="eyebrow">Wir sind für Sie da</p>
+          <h2>Kontakt</h2>
+
+          <p>
+            Bei Fragen oder Problemen während Ihres Aufenthalts können Sie
+            uns gerne kontaktieren.
+          </p>
+
+          <div class="contact-actions">
+            <a
+              class="guide-primary-button"
+              href="tel:[TELEFONNUMMER]"
+            >
+              Anrufen
+            </a>
+
+            <a
+              class="guide-secondary-button"
+              href="https://wa.me/[WHATSAPPNUMMER]"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              WhatsApp
+            </a>
+          </div>
+
+          <p class="guide-note">
+            Telefonnummer und WhatsApp-Link werden im nächsten Schritt mit
+            Ihren tatsächlichen Kontaktdaten ergänzt.
+          </p>
+        </div>
+      </article>
+
+    </section>
+
+    <section
+      id="noSearchResults"
+      class="guide-no-results"
+      hidden
+    >
+      <h2>Keine passende Information gefunden</h2>
+
+      <p>
+        Versuchen Sie einen anderen Suchbegriff oder kontaktieren Sie uns
+        direkt.
+      </p>
+
+      <a class="guide-primary-button" href="#kontakt">
+        Kontakt
+      </a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>
+      Appartements Bürger · Digitaler Gästeguide ·
+      <span id="currentYear"></span>
+    </p>
+  </footer>
+
+  <script src="guide.js"></script>
+</body>
+</html>
