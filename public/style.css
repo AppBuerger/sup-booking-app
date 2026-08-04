@@ -478,6 +478,44 @@ button[type="submit"]:disabled {
   font-size: 0.65rem;
 }
 
+/* Sprachumschalter */
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.language-switcher {
+  display: inline-flex;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 5px 15px rgba(24, 50, 58, 0.05);
+}
+
+.language-button {
+  min-height: 34px;
+  padding: 6px 11px;
+  border: 0;
+  border-radius: 999px;
+  color: var(--primary-dark);
+  background: transparent;
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.language-button:hover {
+  background: var(--primary-light);
+}
+
+.language-button.active {
+  color: #ffffff;
+  background: var(--primary);
+}
+
 @media (max-width: 900px) {
   .page-container {
     grid-template-columns: 1fr;
@@ -498,6 +536,17 @@ button[type="submit"]:disabled {
     gap: 12px;
   }
 
+  .header-actions {
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  }
+
+  .language-button {
+  min-height: 31px;
+  padding: 5px 9px;
+  }
+  
   .brand {
     align-items: center;
     gap: 12px;

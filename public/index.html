@@ -20,32 +20,67 @@
 
         <div class="brand-text">
           <p class="hero-eyebrow">Appartements Bürger</p>
-          <h1>Buchung für SUP und Boot</h1>
+          <h1 data-i18n="pageTitle">
+            Buchung für SUP und Boot</h1>
         </div>
       </div>
 
-      <a class="admin-link" href="admin.html">Admin</a>
+      <div class="header-actions">
+        <div
+          class="language-switcher"
+          aria-label="Sprache auswählen"
+        >
+          <button
+            type="button"
+            class="language-button active"
+            data-language="de"
+            aria-pressed="true"
+          >
+            DE
+          </button>
+
+          <button
+            type="button"
+            class="language-button"
+            data-language="en"
+            aria-pressed="false"
+        >
+            EN
+          </button>
+        </div>
+
+      <a class="admin-link" href="admin.html">
+        Admin
+      </a>
+    </div>
     </div>
   </header>
 
   <main class="page-container">
     <section class="booking-panel">
       <div class="section-heading">
-        <p class="eyebrow">Reservierung</p>
-        <h2>Gerät buchen</h2>
-        <p>
+        <p class="eyebrow" data-i18n="reservation">
+          Reservierung
+        </p>
+        <h2 data-i18n="bookDevice">
+          Gerät buchen</h2>
+        <p data-i18n="bookingInstructions">
           Wähle das gewünschte Gerät sowie Datum und Uhrzeit aus.
         </p>
       </div>
 
       <div id="message" class="message" role="status" aria-live="polite"></div>
 
-      <form id="bookingForm">
+      <form id="bookingForm" novalidate>
 
         <div class="form-group">
-          <label for="apartment">Appartement</label>
+          <label for="apartment" data-i18n="apartment">
+            Appartement
+          </label>
           <select id="apartment" required>
-            <option value="">Appartement wählen</option>
+            <option value="" data-i18n="selectApartment">
+              Appartement wählen
+            </option>
             <option>Top 1</option>
             <option>Top 2</option>
             <option>Top 3</option>
@@ -59,38 +94,48 @@
         </div>
 
         <div class="form-group">
-          <label for="sup">SUP oder Boot</label>
+          <label for="sup" data-i18n="device">
+            SUP oder Boot
+          </label>
           <select id="sup" required></select>
         </div>
 
         <div class="device-preview">
           <div class="device-image-placeholder">
-            <span id="devicePreviewText">SUP auswählen</span>
+            <span id="devicePreviewText" data-i18n="selectDevicePreview">
+              SUP oder Boot auswählen
+            </span>
           </div>
         </div>
 
         <div class="form-group">
-          <label for="date">Datum</label>
+          <label for="date" data-i18n="date">
+            Datum
+          </label>
           <input type="date" id="date" required>
         </div>
 
         <div class="time-grid">
           <div class="form-group">
-            <label for="fromTime">Von</label>
+            <label for="fromTime" data-i18n="from">
+              Von
+            </label>
             <select id="fromTime" required>
               <option value="">Zeit wählen</option>
             </select>
           </div>
 
           <div class="form-group">
-            <label for="toTime">Bis</label>
+            <label for="toTime" data-i18n="to">
+              Bis
+            </label>
             <select id="toTime" required>
               <option value="">Zeit wählen</option>
             </select>
           </div>
         </div>
 
-        <button type="submit" id="submitButton">
+        <button type="submit" id="submitButton" data-i18n="bookNow">
           Jetzt buchen
         </button>
       </form>
@@ -98,9 +143,13 @@
 
     <section class="bookings-panel">
       <div class="section-heading">
-        <p class="eyebrow">Übersicht</p>
-        <h2>Bestehende Buchungen</h2>
-        <p>
+        <p class="eyebrow" data-i18n="overview">
+          Übersicht
+        </p>
+        <h2 data-i18n="existingBookings">
+          Bestehende Buchungen
+        </h2>
+        <p data-i18n="existingBookingsInfo">
           Bereits belegte Zeiten werden hier nach Datum angezeigt.
         </p>
       </div>
@@ -110,11 +159,12 @@
   </main>
 
   <footer class="site-footer">
-    <p>
+    <p data-i18n="footerText">
       SUP-Verleih für Gäste der Appartements Bürger.
     </p>
   </footer>
 
+  <script src="translations.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

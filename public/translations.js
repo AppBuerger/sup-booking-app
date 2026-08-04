@@ -1,0 +1,81 @@
+const translations = {
+  de: {
+    pageTitle: "Buchung für SUP und Boot",
+    reservation: "Reservierung",
+    bookDevice: "Gerät buchen",
+    bookingInstructions:
+      "Wähle das gewünschte Gerät sowie Datum und Uhrzeit aus.",
+    apartment: "Appartement",
+    selectApartment: "Appartement wählen",
+    device: "SUP oder Boot",
+    selectDevicePreview: "SUP oder Boot auswählen",
+    date: "Datum",
+    from: "Von",
+    to: "Bis",
+    bookNow: "Jetzt buchen",
+    overview: "Übersicht",
+    existingBookings: "Bestehende Buchungen",
+    existingBookingsInfo:
+      "Bereits belegte Zeiten werden hier nach Datum angezeigt.",
+    footer:
+        "SUP-Verleih für Gäste der Appartements Bürger.",
+    selectDevice: "SUP oder Boot wählen",
+    selectTime: "Zeit wählen",
+    noBookings: "Derzeit sind noch keine Buchungen vorhanden.",
+    today: "Heute",
+    savingBooking: "Buchung wird gespeichert …",
+    bookingSaved: "Buchung erfolgreich gespeichert.",
+
+    fillAllFields: "Bitte fülle alle Felder aus.",
+    halfHourOnly: "Bitte wähle die Zeiten im Halbstundentakt aus.",
+    endAfterStart: "Die Endzeit muss nach der Startzeit liegen.",
+    minimumOneHour: "Die Mindestbuchungsdauer beträgt eine Stunde.",
+    halfHourSteps: "Die Buchungsdauer muss in 30-Minuten-Schritten erfolgen.",
+
+    loadingDevicesError: "Die Geräteliste konnte nicht geladen werden.",
+    loadingBookingsError: "Die Buchungen konnten nicht geladen werden.",
+    savingError: "Die Buchung konnte nicht gespeichert werden.",
+    generalLoadingError: "Beim Laden ist ein Fehler aufgetreten.",
+    generalSavingError: "Beim Speichern ist ein Fehler aufgetreten.",
+  },
+
+  en: {
+    pageTitle: "Book a SUP or Boat",
+    reservation: "Reservation",
+    bookDevice: "Book equipment",
+    bookingInstructions:
+      "Choose the equipment, date and time you would like to reserve.",
+    apartment: "Apartment",
+    selectApartment: "Select apartment",
+    device: "SUP or boat",
+    selectDevicePreview: "Select a SUP or boat",
+    date: "Date",
+    from: "From",
+    to: "To",
+    bookNow: "Book now",
+    overview: "Overview",
+    existingBookings: "Existing bookings",
+    existingBookingsInfo:
+      "Unavailable times are shown here by date.",
+    footer:
+      "SUP rental for guests of Appartements Bürger.",
+    selectDevice: "Select SUP or boat",
+    selectTime: "Select time",
+    noBookings: "There are currently no bookings.",
+    today: "Today",
+    savingBooking: "Saving booking…",
+    bookingSaved: "Booking saved successfully.",
+
+    fillAllFields: "Please complete all fields.",
+    halfHourOnly: "Please select times in 30-minute intervals.",
+    endAfterStart: "The end time must be after the start time.",
+    minimumOneHour: "The minimum booking duration is one hour.",
+    halfHourSteps: "Bookings must be made in 30-minute intervals.",
+
+    loadingDevicesError: "The device list could not be loaded.",
+    loadingBookingsError: "The bookings could not be loaded.",
+    savingError: "The booking could not be saved.",
+    generalLoadingError: "An error occurred while loading.",
+    generalSavingError: "An error occurred while saving.",
+  },
+};

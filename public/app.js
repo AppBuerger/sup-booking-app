@@ -10,6 +10,108 @@ const fromSelect = document.getElementById("fromTime");
 const toSelect = document.getElementById("toTime");
 const dateInput = document.getElementById("date");
 const apartmentSelect = document.getElementById("apartment");
+const languageButtons = document.querySelectorAll(
+  "[data-language]"
+);
+
+function getInitialLanguage() {
+  const params = new URLSearchParams(
+    window.location.search
+  );
+
+  const languageFromUrl = params.get("lang");
+
+  if (
+    languageFromUrl === "de" ||
+    languageFromUrl === "en"
+  ) {
+    return languageFromUrl;
+  }
+
+  return "de";
+}
+
+let currentLanguage = getInitialLanguage();
+
+function translate(key) {
+  return (
+    translations[currentLanguage]?.[key] ||
+    translations.de[key] ||
+    key
+  );
+}
+
+function translateDeviceName(deviceName) {
+  if (currentLanguage === "en") {
+    switch (deviceName) {
+      case "Ruderboot":
+        return "Rowing boat";
+
+      case "Paddelboot":
+        return "Paddle boat";
+
+      default:
+        return deviceName;
+    }
+  }
+
+  return deviceName;
+}
+
+function applyTranslations() {
+  document.documentElement.lang =
+    currentLanguage;
+
+  document.title =
+    translate("pageTitle");
+
+  document
+    .querySelectorAll("[data-i18n]")
+    .forEach((element) => {
+      const key =
+        element.dataset.i18n;
+
+      element.textContent =
+        translate(key);
+    });
+}
+
+function applyLanguageSelection() {
+  languageButtons.forEach((button) => {
+    const isActive =
+      button.dataset.language === currentLanguage;
+
+    button.classList.toggle(
+      "active",
+      isActive
+    );
+
+    button.setAttribute(
+      "aria-pressed",
+      String(isActive)
+    );
+  });
+
+  localStorage.setItem(
+    "bookingLanguage",
+    currentLanguage
+  );
+
+  const url = new URL(
+    window.location.href
+  );
+
+  url.searchParams.set(
+    "lang",
+    currentLanguage
+  );
+
+  window.history.replaceState(
+    {},
+    "",
+    url
+  );
+}
 
 let messageTimer;
 let allBookings = [];
@@ -42,7 +144,7 @@ function createTimeOption(value, text) {
 
 function addTimePlaceholder(selectElement) {
   selectElement.appendChild(
-    createTimeOption("", "Zeit wählen")
+    createTimeOption("", translate("selectTime"))
   );
 }
 
@@ -240,7 +342,9 @@ function updateDevicePreview() {
   const selectedDevice = getSelectedDevice();
 
   devicePreviewText.textContent =
-    selectedDevice?.name || "SUP oder Boot auswählen";
+  selectedDevice
+    ? translateDeviceName(selectedDevice.name)
+    : translate("selectDevicePreview");
 }
 
 async function loadSUPs() {
@@ -248,7 +352,7 @@ async function loadSUPs() {
 
   if (!response.ok) {
     throw new Error(
-      "Die Geräteliste konnte nicht geladen werden."
+      translate("loadingDevicesError")
     );
   }
 
@@ -259,7 +363,7 @@ async function loadSUPs() {
 
   const placeholder = document.createElement("option");
   placeholder.value = "";
-  placeholder.textContent = "SUP oder Boot wählen";
+  placeholder.textContent = translate("selectDevice");
   placeholder.disabled = true;
   placeholder.selected = true;
   supSelect.appendChild(placeholder);
@@ -267,7 +371,7 @@ async function loadSUPs() {
   allDevices.forEach((device) => {
     const option = document.createElement("option");
     option.value = device.id;
-    option.textContent = device.name;
+    option.textContent = translateDeviceName(device.name);
     option.dataset.imageFilename = device.image_filename || "";
     supSelect.appendChild(option);
   });
@@ -297,7 +401,7 @@ function createBookingCard(booking) {
   const device = document.createElement("p");
   device.className = "booking-device";
   device.textContent =
-    booking.device_name || booking.sup || "Gerät";
+    booking.device_name || booking.sup || translate("device");
 
   const time = document.createElement("p");
   time.className = "booking-time";
@@ -317,7 +421,7 @@ function renderBookings(bookings) {
     const emptyState = document.createElement("div");
     emptyState.className = "empty-state";
     emptyState.textContent =
-      "Derzeit sind noch keine Buchungen vorhanden.";
+      translate("noBookings");
     bookingsList.appendChild(emptyState);
     return;
   }
@@ -350,7 +454,7 @@ function renderBookings(bookings) {
       const heading = document.createElement("h3");
       heading.className = "booking-day-heading";
       heading.textContent = isToday
-        ? `Heute · ${formatDate(dateKey)}`
+        ? `${translate("today")} · ${formatDate(dateKey)}`
         : formatDate(dateKey);
 
       const cards = document.createElement("div");
@@ -375,7 +479,7 @@ async function loadBookings() {
 
   if (!response.ok) {
     throw new Error(
-      "Die Buchungen konnten nicht geladen werden."
+      translate("loadingBookingsError")
     );
   }
 
@@ -396,13 +500,16 @@ form.addEventListener("submit", async (event) => {
   const bis = toSelect.value;
 
   if (!appartement || !deviceId || !datum || !von || !bis) {
-    showMessage("Bitte fülle alle Felder aus.", "error");
+    showMessage(
+      translate("fillAllFields"),
+      "error"
+    );
     return;
   }
 
   if (!isHalfHourTime(von) || !isHalfHourTime(bis)) {
     showMessage(
-      "Bitte wähle die Zeiten im Halbstundentakt aus.",
+      translate("halfHourOnly"),
       "error"
     );
     return;
@@ -413,7 +520,7 @@ form.addEventListener("submit", async (event) => {
 
   if (durationMinutes <= 0) {
     showMessage(
-      "Die Endzeit muss nach der Startzeit liegen.",
+      translate("endAfterStart"),
       "error"
     );
     return;
@@ -421,7 +528,7 @@ form.addEventListener("submit", async (event) => {
 
   if (durationMinutes < 60) {
     showMessage(
-      "Die Mindestbuchungsdauer beträgt eine Stunde.",
+      translate("minimumOneHour"),
       "error"
     );
     return;
@@ -429,14 +536,14 @@ form.addEventListener("submit", async (event) => {
 
   if (durationMinutes % 30 !== 0) {
     showMessage(
-      "Die Buchungsdauer muss in 30-Minuten-Schritten erfolgen.",
+      translate("halfHourSteps"),
       "error"
     );
     return;
   }
 
   submitButton.disabled = true;
-  submitButton.textContent = "Buchung wird gespeichert …";
+  submitButton.textContent = translate("savingBooking");
 
   try {
     const response = await fetch("/api/book", {
@@ -459,7 +566,7 @@ form.addEventListener("submit", async (event) => {
       throw new Error(
         result.message ||
         result.error ||
-        "Die Buchung konnte nicht gespeichert werden."
+        translate("savingError")
       );
     }
 
@@ -476,7 +583,7 @@ form.addEventListener("submit", async (event) => {
     updateTimeAvailability();
 
     showMessage(
-      result.message || "Buchung erfolgreich gespeichert.",
+      result.message || translate("bookingSaved"),
       "success"
     );
 
@@ -486,12 +593,12 @@ form.addEventListener("submit", async (event) => {
 
     showMessage(
       error.message ||
-      "Beim Speichern ist ein Fehler aufgetreten.",
+      translate("generalSavingError"),
       "error"
     );
   } finally {
     submitButton.disabled = false;
-    submitButton.textContent = "Jetzt buchen";
+    submitButton.textContent = translate("bookNow");
   }
 });
 
@@ -505,6 +612,14 @@ fromSelect.addEventListener("change", fillEndTimes);
 
 async function initializeApp() {
   try {
+    applyLanguageSelection();
+    applyTranslations();
+
+    loadSUPs();
+    renderBookings(allBookings);
+    updateTimeAvailability();
+    updateDevicePreview();
+
     setMinimumDate();
     await loadSUPs();
     await loadBookings();
@@ -513,10 +628,30 @@ async function initializeApp() {
     console.error(error);
 
     showMessage(
-      error.message || "Beim Laden ist ein Fehler aufgetreten.",
+      error.message || translate("generalLoadingError"),
       "error"
     );
   }
 }
+
+languageButtons.forEach((button) => {
+  button.addEventListener(
+    "click",
+    async() => {
+      currentLanguage =
+        button.dataset.language;
+
+      applyLanguageSelection();
+      applyTranslations();
+
+      await loadSUPs();
+
+      renderBookings(allBookings);
+      
+      updateDevicePreview();
+      updateTimeAvailability();
+    }
+  );
+});
 
 initializeApp();
