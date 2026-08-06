@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>
+    Mülltrennung – Appartements Bürger
+  </title>
+
+  <link rel="stylesheet" href="guide.css">
+</head>
+
+<body>
+  <div id="portalHeader"></div>
+
+  <main class="portal-main">
+    <section class="page-intro">
+      <a
+        class="back-link"
+        href="/guide/haus.html"
+        data-i18n="backHouse"
+      >
+        ← Zu Haus & Appartement
+      </a>
+
+      <p
+        class="welcome-eyebrow"
+        data-i18n="wasteEyebrow"
+      >
+        Gemeinsam nachhaltig
+      </p>
+
+      <h1 data-i18n="wasteTitle">
+        Mülltrennung
+      </h1>
+
+      <p
+        class="page-intro__text"
+        data-i18n="wasteIntro"
+      >
+        Bitte helfen Sie uns, Abfälle richtig zu trennen
+        und umweltbewusst zu entsorgen.
+      </p>
+    </section>
+
+    <section class="info-grid">
+      <article class="info-card info-card--featured">
+        <span class="info-card__icon">
+          ♻️
+        </span>
+
+        <div>
+          <h2 data-i18n="wasteSeparationTitle">
+            Abfälle trennen
+          </h2>
+
+          <p data-i18n="wasteSeparationText">
+            Bitte trennen Sie Ihren Abfall entsprechend
+            den vorgesehenen Kategorien.
+          </p>
+        </div>
+      </article>
+
+      <article class="info-card">
+        <span class="info-card__icon">
+          🪧
+        </span>
+
+        <div>
+          <h2 data-i18n="wasteLabelsTitle">
+            Beschriftungen beachten
+          </h2>
+
+          <p data-i18n="wasteLabelsText">
+            Achten Sie bitte auf die Beschriftungen
+            an den Sammelbehältern und an der Müllinsel.
+          </p>
+        </div>
+      </article>
+
+      <article class="info-card">
+        <span class="info-card__icon">
+          🍾
+        </span>
+
+        <div>
+          <h2 data-i18n="glassTitle">
+            Glas
+          </h2>
+
+          <p data-i18n="glassText">
+            Glas bitte getrennt und in den dafür
+            vorgesehenen Behältern entsorgen.
+          </p>
+        </div>
+      </article>
+
+      <article class="info-card">
+        <span class="info-card__icon">
+          📦
+        </span>
+
+        <div>
+          <h2 data-i18n="paperTitle">
+            Papier und Karton
+          </h2>
+
+          <p data-i18n="paperText">
+            Papier und Karton bitte möglichst flach
+            zusammenlegen und getrennt entsorgen.
+          </p>
+        </div>
+      </article>
+
+      <article class="info-card">
+        <span class="info-card__icon">
+          🥫
+        </span>
+
+        <div>
+          <h2 data-i18n="packagingTitle">
+            Verpackungen
+          </h2>
+
+          <p data-i18n="packagingText">
+            Verpackungen bitte in den dafür vorgesehenen
+            Sammelbehältern entsorgen.
+          </p>
+        </div>
+      </article>
+
+      <article class="info-card">
+        <span class="info-card__icon">
+          🗑️
+        </span>
+
+        <div>
+          <h2 data-i18n="residualWasteTitle">
+            Restmüll
+          </h2>
+
+          <p data-i18n="residualWasteText">
+            Nicht verwertbare Abfälle gehören in den
+            Restmüllbehälter.
+          </p>
+        </div>
+      </article>
+    </section>
+
+    <section class="checklist-card">
+      <div class="checklist-card__heading">
+        <span class="checklist-card__icon">
+          ✓
+        </span>
+
+        <div>
+          <p
+            class="welcome-eyebrow"
+            data-i18n="wasteTipsEyebrow"
+          >
+            Bitte beachten Sie
+          </p>
+
+          <h2 data-i18n="wasteTipsTitle">
+            So helfen Sie uns:
+          </h2>
+        </div>
+      </div>
+
+      <ul class="checklist">
+        <li data-i18n="wasteTipSeparate">
+          Abfälle sorgfältig trennen
+        </li>
+
+        <li data-i18n="wasteTipLabels">
+          Beschriftungen an den Behältern beachten
+        </li>
+
+        <li data-i18n="wasteTipCardboard">
+          Kartons flach zusammenlegen
+        </li>
+
+        <li data-i18n="wasteTipClean">
+          Sammelbereich sauber hinterlassen
+        </li>
+      </ul>
+    </section>
+
+    <section class="help-card">
+      <div>
+        <p
+          class="welcome-eyebrow"
+          data-i18n="wasteHelpEyebrow"
+        >
+          Unsicher bei der Trennung?
+        </p>
+
+        <h2 data-i18n="wasteHelpTitle">
+          Fragen Sie uns gerne.
+        </h2>
+
+        <p data-i18n="wasteHelpText">
+          Wir helfen Ihnen gerne weiter, wenn Sie nicht
+          wissen, in welchen Behälter ein Abfall gehört.
+        </p>
+      </div>
+
+      <a
+        class="action-button"
+        href="tel:+436642528210"
+        data-i18n="callUs"
+      >
+        Jetzt anrufen
+      </a>
+    </section>
+  </main>
+
+  <script src="translations.js"></script>
+  <script src="guide.js"></script>
+</body>
+</html>

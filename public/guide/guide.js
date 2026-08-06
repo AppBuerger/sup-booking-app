@@ -1,3 +1,5 @@
+const guideLanguageListeners = [];
+
 const headerTarget =
   document.getElementById("portalHeader");
 
@@ -79,8 +81,17 @@ function initializeHeaderControls() {
           button.dataset.language;
 
         applyGuideTranslations();
+
+        guideLanguageListeners.forEach(
+            (listener) => listener()
       });
     });
+}
+
+function addGuideLanguageListener(listener) {
+  if (typeof listener === "function") {
+    guideLanguageListeners.push(listener);
+  }
 }
 
 async function loadHeader() {

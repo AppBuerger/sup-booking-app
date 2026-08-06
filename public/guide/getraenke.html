@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>
+    Getränke – Appartements Bürger
+  </title>
+
+  <link rel="stylesheet" href="guide.css">
+</head>
+
+<body>
+  <div id="portalHeader"></div>
+
+  <main class="portal-main">
+    <section class="page-intro">
+      <a
+        class="back-link"
+        href="/guide/service.html"
+        data-i18n="backService"
+      >
+        ← Zurück zu Service
+      </a>
+
+      <p
+        class="welcome-eyebrow"
+        data-i18n="drinksEyebrow"
+      >
+        Gästekühlschrank
+      </p>
+
+      <h1 data-i18n="drinksPageTitle">
+        Getränke entnehmen
+      </h1>
+
+      <p
+        class="page-intro__text"
+        data-i18n="drinksIntro"
+      >
+        Wählen Sie Ihr Appartement, das gewünschte
+        Getränk und die entnommene Menge aus.
+      </p>
+    </section>
+
+    <section class="drink-order-card">
+      <form id="drinkForm" novalidate>
+        <div class="form-group">
+          <label
+            for="drinkApartment"
+            data-i18n="drinksApartmentLabel"
+          >
+            Appartement
+          </label>
+
+          <select id="drinkApartment" required>
+            <option
+              value=""
+              data-i18n="drinksApartmentPlaceholder"
+            >
+              Appartement wählen
+            </option>
+
+            <option>Top 1</option>
+            <option>Top 2</option>
+            <option>Top 3</option>
+            <option>Top 4</option>
+            <option>Top 5</option>
+            <option>Top 11</option>
+            <option>Top 12</option>
+            <option>Top 13</option>
+            <option>Top 14</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label
+            for="drinkSelect"
+            data-i18n="drinksProductLabel"
+          >
+            Getränk
+          </label>
+
+          <select id="drinkSelect" required>
+            <option
+              value=""
+              data-i18n="drinksProductPlaceholder"
+            >
+              Getränk wählen
+            </option>
+
+            <option value="water">
+              Mineralwasser
+            </option>
+
+            <option value="cola">
+              Cola
+            </option>
+
+            <option value="lemonade">
+              Limonade
+            </option>
+
+            <option value="beer">
+              Bier
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label
+            for="drinkQuantity"
+            data-i18n="drinksQuantityLabel"
+          >
+            Menge
+          </label>
+
+          <select id="drinkQuantity" required>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+          </select>
+        </div>
+
+        <div
+          id="drinkMessage"
+          class="message"
+          role="status"
+          aria-live="polite"
+        ></div>
+
+        <button
+          type="submit"
+          class="action-button drink-submit-button"
+          data-i18n="drinksConfirmButton"
+        >
+          Entnahme eintragen
+        </button>
+      </form>
+    </section>
+
+    <section class="info-grid drinks-info-grid">
+      <article class="info-card">
+        <span class="info-card__icon">
+          🧾
+        </span>
+
+        <div>
+          <h2 data-i18n="drinksBillingTitle">
+            Abrechnung
+          </h2>
+
+          <p data-i18n="drinksBillingText">
+            Die Getränke werden Ihrem Appartement
+            zugeordnet und später verrechnet.
+          </p>
+        </div>
+      </article>
+
+      <article class="info-card">
+        <span class="info-card__icon">
+          ✅
+        </span>
+
+        <div>
+          <h2 data-i18n="drinksHonestyTitle">
+            Bitte korrekt eintragen
+          </h2>
+
+          <p data-i18n="drinksHonestyText">
+            Tragen Sie bitte jede Entnahme unmittelbar
+            und vollständig ein.
+          </p>
+        </div>
+      </article>
+    </section>
+
+    <section class="help-card">
+      <div>
+        <p
+          class="welcome-eyebrow"
+          data-i18n="drinksHelpEyebrow"
+        >
+          Etwas unklar?
+        </p>
+
+        <h2 data-i18n="drinksHelpTitle">
+          Wir helfen Ihnen gerne.
+        </h2>
+
+        <p data-i18n="drinksHelpText">
+          Melden Sie sich bitte bei uns, wenn ein
+          Getränk fehlt oder Sie Fragen zur Abrechnung
+          haben.
+        </p>
+      </div>
+
+      <a
+        class="action-button"
+        href="tel:+436642528210"
+        data-i18n="callUs"
+      >
+        Jetzt anrufen
+      </a>
+    </section>
+  </main>
+
+  <script src="translations.js"></script>
+  <script src="guide.js"></script>
+  <script src="getraenke.js"></script>
+</body>
+</html>
