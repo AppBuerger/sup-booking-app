@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>
+    Gästeguide verwalten – Appartements Bürger
+  </title>
+
+  <link rel="stylesheet" href="admin-guide.css">
+</head>
+
+<body>
+  <header class="admin-header">
+    <div class="admin-header__inner">
+      <div>
+        <p class="admin-eyebrow">
+          Appartements Bürger
+        </p>
+
+        <h1>Gästeguide verwalten</h1>
+
+        <p class="admin-header__text">
+          Empfehlungen, Orte und wichtige Informationen
+          für den digitalen Urlaubsbegleiter.
+        </p>
+      </div>
+
+      <div class="admin-header__actions">
+        <a
+          class="secondary-button"
+          href="admin.html"
+        >
+          ← Zum Adminbereich SUP & Boot
+        </a>
+
+        <a
+          class="secondary-button"
+          href="/guide/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Gästeguide ansehen
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="admin-main">
+    <section class="admin-summary">
+      <article class="summary-card">
+        <span class="summary-card__label">
+          Aktive Einträge
+        </span>
+
+        <strong id="activePlaceCount">
+          0
+        </strong>
+      </article>
+
+      <article class="summary-card">
+        <span class="summary-card__label">
+          Inaktive Einträge
+        </span>
+
+        <strong id="inactivePlaceCount">
+          0
+        </strong>
+      </article>
+
+      <article class="summary-card">
+        <span class="summary-card__label">
+          Kategorien
+        </span>
+
+        <strong id="sectionCount">
+          0
+        </strong>
+      </article>
+    </section>
+
+    <section class="admin-toolbar">
+      <div>
+        <p class="admin-eyebrow">
+          Inhalte
+        </p>
+
+        <h2>Einträge verwalten</h2>
+
+        <p>
+          Wählen Sie eine Kategorie oder legen Sie
+          einen neuen Eintrag an.
+        </p>
+      </div>
+
+      <button
+        id="newPlaceButton"
+        class="primary-button"
+        type="button"
+      >
+        + Neuer Eintrag
+      </button>
+    </section>
+
+    <section
+      class="category-grid"
+      aria-label="Kategorien"
+    >
+      <button
+        type="button"
+        class="category-button active"
+        data-section="all"
+      >
+        <span>📋</span>
+
+        <span>
+          <strong>Alle Einträge</strong>
+          <small>Gesamte Übersicht</small>
+        </span>
+      </button>
+
+      <button
+        type="button"
+        class="category-button"
+        data-section="restaurants"
+      >
+        <span>🍽️</span>
+
+        <span>
+          <strong>Restaurants</strong>
+          <small>Essen gehen</small>
+        </span>
+      </button>
+
+      <button
+        type="button"
+        class="category-button"
+        data-section="breakfast"
+      >
+        <span>🥐</span>
+
+        <span>
+          <strong>Frühstück</strong>
+          <small>Frühstücksmöglichkeiten</small>
+        </span>
+      </button>
+
+      <button
+        type="button"
+        class="category-button"
+        data-section="cafes"
+      >
+        <span>☕</span>
+
+        <span>
+          <strong>Cafés</strong>
+          <small>Kaffee und Kuchen</small>
+        </span>
+      </button>
+
+      <button
+        type="button"
+        class="category-button"
+        data-section="shopping"
+      >
+        <span>🛒</span>
+
+        <span>
+          <strong>Einkaufen</strong>
+          <small>Supermärkte und Geschäfte</small>
+        </span>
+      </button>
+
+      <button
+        type="button"
+        class="category-button"
+        data-section="bakeries"
+      >
+        <span>🥖</span>
+
+        <span>
+          <strong>Bäckereien</strong>
+          <small>Brot und Gebäck</small>
+        </span>
+      </button>
+
+      <button
+        type="button"
+        class="category-button"
+        data-section="regional"
+      >
+        <span>🧺</span>
+
+        <span>
+          <strong>Regionale Produkte</strong>
+          <small>Direktvermarkter</small>
+        </span>
+      </button>
+
+      <button
+        type="button"
+        class="category-button"
+        data-section="excursions"
+      >
+        <span>🌞</span>
+
+        <span>
+          <strong>Freizeit & Ausflüge</strong>
+          <small>Sehenswürdigkeiten und Aktivitäten</small>
+        </span>
+      </button>
+
+      <button
+        type="button"
+        class="category-button"
+        data-section="mobility"
+      >
+        <span>🚌</span>
+
+        <span>
+          <strong>Mobilität</strong>
+          <small>Bus, Bahn und Taxi</small>
+        </span>
+      </button>
+
+      <button
+        type="button"
+        class="category-button"
+        data-section="doctors"
+      >
+        <span>🩺</span>
+
+        <span>
+          <strong>Ärzte</strong>
+          <small>Medizinische Hilfe</small>
+        </span>
+      </button>
+
+      <button
+        type="button"
+        class="category-button"
+        data-section="pharmacies"
+      >
+        <span>💊</span>
+
+        <span>
+          <strong>Apotheken</strong>
+          <small>Medikamente und Beratung</small>
+        </span>
+      </button>
+    </section>
+
+    <section class="entries-panel">
+      <div class="entries-panel__heading">
+        <div>
+          <p class="admin-eyebrow">
+            Auswahl
+          </p>
+
+          <h2 id="selectedSectionTitle">
+            Alle Einträge
+          </h2>
+        </div>
+
+        <label class="search-field">
+          <span class="visually-hidden">
+            Einträge durchsuchen
+          </span>
+
+          <input
+            id="placeSearch"
+            type="search"
+            placeholder="Einträge durchsuchen …"
+          >
+        </label>
+      </div>
+
+      <div
+        id="placesMessage"
+        class="admin-message"
+        role="status"
+        aria-live="polite"
+      ></div>
+
+      <div
+        id="placesAdminList"
+        class="admin-entry-list"
+      >
+        <div class="empty-admin-state">
+          <span aria-hidden="true">📍</span>
+
+          <h3>Noch keine Einträge geladen</h3>
+
+          <p>
+            Im nächsten Schritt verbinden wir diese
+            Übersicht mit der Tabelle
+            <code>guest_places</code>.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <script src="admin-guide-components.js"></script>
+  <script src="admin-guide.js"></script>
+</body>
+</html>

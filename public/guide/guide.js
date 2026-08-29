@@ -84,7 +84,7 @@ function initializeHeaderControls() {
 
         guideLanguageListeners.forEach(
             (listener) => listener()
-      });
+    )});
     });
 }
 

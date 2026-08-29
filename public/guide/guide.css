@@ -892,5 +892,56 @@ a.service-card:hover {
   }
 }
 
+.places-page {
+  display: grid;
+  gap: 34px;
+}
+
+.places-section {
+  display: grid;
+  gap: 16px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid var(--border);
+}
+
+.places-section:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.places-section__heading {
+  display: grid;
+  gap: 8px;
+}
+
+.places-section__title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.places-section__icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 auto;
+  border-radius: 14px;
+  background: var(--primary-light);
+  font-size: 1.45rem;
+}
+
+.places-section h2 {
+  margin: 0;
+  font-size: clamp(1.45rem, 4vw, 2rem);
+}
+
+.places-section__heading p {
+  max-width: 760px;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
 
 

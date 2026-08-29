@@ -1162,6 +1162,35 @@ restaurantsPageTitle:
 restaurantsPageIntro:
 "Unsere persönlichen Empfehlungen rund um Krumpendorf und den Wörthersee.",
 
+ourRecommendation:
+  "Unsere Empfehlung",
+
+navigation:
+  "Navigation",
+
+website:
+  "Website",
+
+call:
+  "Anrufen",
+
+noRecommendations:
+  "Derzeit sind noch keine Empfehlungen eingetragen.",
+
+  ourRecommendation:
+  "Unsere Empfehlung",
+
+navigation:
+  "Route öffnen",
+
+website:
+  "Website",
+
+call:
+  "Anrufen",
+
+noRecommendations:
+  "Derzeit sind noch keine Empfehlungen eingetragen.",
 
 
     },
@@ -2332,7 +2361,35 @@ restaurantsPageTitle:
 restaurantsPageIntro:
 "Unsere persönlichen Empfehlungen rund um Krumpendorf und den Wörthersee.",
 
+ourRecommendation:
+  "Our recommendation",
 
+navigation:
+  "Directions",
+
+website:
+  "Website",
+
+call:
+  "Call",
+
+noRecommendations:
+  "There are currently no recommendations available.",
+
+  ourRecommendation:
+  "Our recommendation",
+
+navigation:
+  "Directions",
+
+website:
+  "Website",
+
+call:
+  "Call",
+
+noRecommendations:
+  "There are currently no recommendations available.",
 
     },
 };

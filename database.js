@@ -128,11 +128,52 @@ async function initDb() {
       ON billing_documents (created_at DESC);
     `);
 
+      // Einträge für den digitalen Gästeguide
+     await pool.query(`
+      CREATE TABLE IF NOT EXISTS guest_places (
+        id BIGSERIAL PRIMARY KEY,
+
+        section TEXT NOT NULL,
+
+        name_de TEXT NOT NULL,
+        name_en TEXT,
+
+        category_de TEXT,
+        category_en TEXT,
+
+        description_de TEXT,
+        description_en TEXT,
+
+        website_url TEXT,
+        maps_url TEXT,
+        phone TEXT,
+
+        is_recommended BOOLEAN NOT NULL DEFAULT FALSE,
+        is_active BOOLEAN NOT NULL DEFAULT TRUE,
+        display_order INTEGER NOT NULL DEFAULT 0,
+
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS guest_places_section_active_order_idx
+      ON guest_places (
+        section,
+        is_active,
+        display_order,
+        name_de
+        );
+    `);
+
     await pool.query("COMMIT");
   } catch (error) {
     await pool.query("ROLLBACK");
     throw error;
   }
+
+
 }
 
 module.exports = {
